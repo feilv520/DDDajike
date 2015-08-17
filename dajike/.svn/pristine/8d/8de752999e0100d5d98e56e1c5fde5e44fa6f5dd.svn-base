@@ -1,0 +1,119 @@
+//
+//  UserInfoModel.h
+//  jibaobao
+//
+//  Created by swb on 15/5/22.
+//  Copyright (c) 2015年 dajike. All rights reserved.
+//
+
+
+
+
+/*
+ ***  会员信息类(MyUserInfos.index)
+ */
+
+#import <Foundation/Foundation.h>
+//bankCount = 1;
+//birthday = 1388505600000;
+//cardId = 430122421322124551;
+//collectCount = 0;
+//couponCount = 0;
+//dropState = 1;
+//email = "263401320@qq.com";
+//emailActiveCode = "";
+//emailBindStatus = 1;
+//emailCode = "<null>";
+//entityId = 229;
+//gender = 1;
+//goodsCount = 2;
+//imQq = "";
+//lastIp = "116.226.3.153";
+//lastLogin = 1437467201;
+//logins = 808;
+//memberType = 01;
+//nickName = dajike;
+//outerId = 0;
+//password = 1;
+//password2 = 1;
+//persistent = 1;
+//phoneMob = 13564645454;
+//phoneMobBindStatus = 1;
+//phoneTel = "<null>";
+//portrait = "http://img01.mandi.net.cn/data/files/2015/0714/1436857442111.jpg!4";
+//question = "<null>";
+//realName = "\U54c8\U54c8";
+//regIp = "<null>";
+//regTime = 1377817731;
+//regionId = "<null>";
+//regionName = "<null>";
+//shopName = sfsfsd;
+//spreaderType = 1;
+//status = 2;
+//storeCount = 1;
+//userId = 229;
+//userName = test02;
+//weixinId = "<null>";
+//weixinIsDefault = 1;
+//weixinUnionId = "<null>";
+
+@interface UserInfoModel : NSObject
+
+@property (strong, nonatomic) NSString      *userId;        //会员Id
+
+@property (strong, nonatomic) NSString      *userName;      //会员名
+
+@property (strong, nonatomic) NSString      *email;         //会员邮箱
+
+@property (strong, nonatomic) NSString      *emailCode;     //
+
+@property (strong, nonatomic) NSString      *password;      //用户登录密码
+
+@property (strong, nonatomic) NSString      *password2;     //大集客支付密码
+
+@property (strong, nonatomic) NSString      *realName;      //真实姓名
+
+@property (strong, nonatomic) NSString      *gender;        //性别
+
+@property (strong, nonatomic) NSString      *phoneTel;
+
+@property (strong, nonatomic) NSString      *phoneMob;      //手机号
+
+@property (strong, nonatomic) NSString      *imQq;
+
+@property (strong, nonatomic) NSString      *regTime;       //注册时间 时间戳格式
+
+@property (strong, nonatomic) NSString      *lastLogin;     //最后登录时间 时间戳格式
+
+@property (strong, nonatomic) NSString      *lastIp;        //最后登录IP地址
+
+@property (strong, nonatomic) NSString      *portrait;      //会员头像地址
+
+@property (strong, nonatomic) NSString      *memberType;    //类型01:会员,02:服务中心,03服务中心子账号,04采购
+
+@property (strong, nonatomic) NSString      *status;        //会员状态: 0待激活,1待审核,2正常,3冻结
+
+@property (strong, nonatomic) NSString      *dropState;     // 是否删除 0已删除,1未删除
+
+@property (strong, nonatomic) NSString      *emailActiveCode;           //邮箱验证码
+
+@property (strong, nonatomic) NSString      *phoneMobBindStatus;        //手机号是否绑定  0为否 1为是
+
+@property (strong, nonatomic) NSString      *emailBindStatus;           //邮箱是否绑定 0为否 1为是
+
+@property (strong, nonatomic) NSString      *nickName;      //用户昵称
+
+@property (strong, nonatomic) NSString      *spreaderType;  //是否开通集客小店 1为是 0为否
+
+@property (strong, nonatomic) NSString      *shopName;      //集客小店名称
+
+@property (strong, nonatomic) NSString      *bankCount;      //绑定的银行卡总数
+
+@property (strong, nonatomic) NSString      *couponCount;     //优惠券总数
+
+@property (strong, nonatomic) NSString      *collectCount;    //收藏总数
+@property (strong, nonatomic) NSString      *goodsCount;
+@property (strong, nonatomic) NSString      *storeCount;
+@property (strong, nonatomic) NSString      *friendCount;
+
+@end

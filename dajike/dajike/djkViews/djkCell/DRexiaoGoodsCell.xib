@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7702" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="DRexiaoGoodsCell">
+            <rect key="frame" x="0.0" y="0.0" width="155" height="249"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="155" height="249"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="2_03.png" translatesAutoresizingMaskIntoConstraints="NO" id="9zz-Ki-udl">
+                        <rect key="frame" x="0.0" y="0.0" width="155" height="155"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="9zz-Ki-udl" secondAttribute="height" multiplier="1:1" id="IWB-7a-NEw"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2015 zhjhxsj jhjkhj jkjhh jhjkh kjhjk kjhkj kjkj nmnm huh nmb " lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Vk-13-CGV">
+                        <rect key="frame" x="14" y="168" width="127" height="37"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="0Vk-13-CGV" secondAttribute="height" multiplier="127:37" id="c5c-5s-XOw"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="250.0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f1b-Yj-Hjg">
+                        <rect key="frame" x="8" y="213" width="43" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="Er2-qf-qbI"/>
+                            <constraint firstAttribute="width" constant="43" id="tHG-pz-EEd"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.89534011989999995" green="0.89534011989999995" blue="0.89534011989999995" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="djk_index_19.png" translatesAutoresizingMaskIntoConstraints="NO" id="V8T-yq-Il8">
+                        <rect key="frame" x="122" y="210" width="25" height="24"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="25" id="XhN-Qw-Nr8"/>
+                            <constraint firstAttribute="height" constant="24" id="qME-jT-dk6"/>
+                        </constraints>
+                    </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="l69-Il-Rz8">
+                        <rect key="frame" x="109" y="203" width="46" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="l69-Il-Rz8" secondAttribute="height" multiplier="23:20" id="qbK-j4-RMi"/>
+                        </constraints>
+                        <state key="normal">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                    </button>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            </view>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="0Vk-13-CGV" firstAttribute="top" secondItem="9zz-Ki-udl" secondAttribute="bottom" constant="13" id="10c-HR-j5O"/>
+                <constraint firstAttribute="bottom" secondItem="l69-Il-Rz8" secondAttribute="bottom" constant="6" id="EDA-vL-FFo"/>
+                <constraint firstItem="l69-Il-Rz8" firstAttribute="top" secondItem="9zz-Ki-udl" secondAttribute="bottom" constant="48" id="Gjp-Zg-txZ"/>
+                <constraint firstItem="9zz-Ki-udl" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="IIs-bV-OAL"/>
+                <constraint firstItem="f1b-Yj-Hjg" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="8" id="KCj-Nr-vSv"/>
+                <constraint firstItem="9zz-Ki-udl" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="KWa-SK-8hb"/>
+                <constraint firstAttribute="trailing" secondItem="V8T-yq-Il8" secondAttribute="trailing" constant="8" id="LfU-sq-Klr"/>
+                <constraint firstAttribute="bottom" secondItem="V8T-yq-Il8" secondAttribute="bottom" constant="15" id="VGN-CS-Co2"/>
+                <constraint firstAttribute="trailing" secondItem="l69-Il-Rz8" secondAttribute="trailing" id="fGW-tm-pHh"/>
+                <constraint firstItem="0Vk-13-CGV" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="14" id="gkJ-zT-b6n"/>
+                <constraint firstAttribute="trailing" secondItem="0Vk-13-CGV" secondAttribute="trailing" constant="14" id="kuU-hZ-Yhc"/>
+                <constraint firstAttribute="bottom" secondItem="f1b-Yj-Hjg" secondAttribute="bottom" constant="15" id="spG-6Z-CQ6"/>
+                <constraint firstAttribute="trailing" secondItem="9zz-Ki-udl" secondAttribute="trailing" id="vAi-mC-s4B"/>
+            </constraints>
+            <size key="customSize" width="159" height="219"/>
+            <connections>
+                <outlet property="mainImageVIew" destination="9zz-Ki-udl" id="KhB-1z-Ue7"/>
+                <outlet property="priceLabel" destination="f1b-Yj-Hjg" id="LqT-Yw-lFR"/>
+                <outlet property="shoucangImageView" destination="V8T-yq-Il8" id="SKz-wC-Edm"/>
+                <outlet property="shoucangLabel" destination="l69-Il-Rz8" id="1Ui-Wi-NZ6"/>
+                <outlet property="titleLabel" destination="0Vk-13-CGV" id="06s-NH-bTP"/>
+            </connections>
+            <point key="canvasLocation" x="507.5" y="424.5"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="2_03.png" width="121" height="121"/>
+        <image name="djk_index_19.png" width="60" height="60"/>
+    </resources>
+</document>

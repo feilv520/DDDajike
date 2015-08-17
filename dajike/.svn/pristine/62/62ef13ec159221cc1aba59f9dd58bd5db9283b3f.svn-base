@@ -1,0 +1,23 @@
+//
+//  DOrderThirdCell.h
+//  dajike
+//
+//  Created by swb on 15/7/16.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "DMyOrderModel.h"
+
+@interface DOrderThirdCell : UITableViewCell
+@property (weak, nonatomic) IBOutlet UILabel *allMoneyLb;
+@property (weak, nonatomic) IBOutlet UILabel *yunfeiLb;
+@property (weak, nonatomic) IBOutlet UILabel *yueLb;
+@property (weak, nonatomic) IBOutlet UILabel *chongzhiLb;
+@property (weak, nonatomic) IBOutlet UILabel *shifukuanLb;
+
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *lineViewCon;
+
+@property (strong, nonatomic) DMyOrderModel *model;
+
+@end

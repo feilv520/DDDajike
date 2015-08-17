@@ -1,0 +1,21 @@
+//
+//  DClassModel.h
+//  dajike
+//
+//  Created by apple on 15/7/21.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface DClassModel : NSObject
+
+@property (nonatomic, assign) NSInteger cate_id;
+
+@property (nonatomic, copy) NSString *cate_name;
+
+@property (nonatomic, assign) NSInteger parent_id;
+
+@property (nonatomic, copy) NSString *imgUrl;
+
+@end

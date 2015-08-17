@@ -1,0 +1,18 @@
+//
+//  DWebViewController.h
+//  dajike
+//
+//  Created by dajike on 15/7/15.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+/*
+ 帮助中心
+ 关于我们
+ 用户协议
+ 特别声明
+ */
+#import "DBackNavigationViewController.h"
+
+@interface DWebViewController : DBackNavigationViewController
+@property (assign, nonatomic) NSInteger isHelp;//help_center  1      aboun us 2 大集客用户协议公告 3  特别声明 4  抽奖规则 5
+@end

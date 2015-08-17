@@ -1,0 +1,259 @@
+//
+//  DGetCashViewController.m
+//  dajike
+//
+//  Created by songjw on 15/7/20.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DGetCashViewController.h"
+#import "dDefine.h"
+#import "DMyAfHTTPClient.h"
+#import "AnalysisData.h"
+#import "DES3Util.h"
+#import "BankBoundListModel.h"
+
+#import "DVerifyPhoneNumViewController.h"
+
+
+@interface DGetCashViewController (){
+    NSMutableArray *_bankDataArr;
+    BankBoundListModel *_selectedCardModel;
+    BOOL _bankListFlag;
+}
+
+
+@property (weak, nonatomic) IBOutlet UILabel *cardLabel;
+@property (weak, nonatomic) IBOutlet UILabel *label1;
+@property (weak, nonatomic) IBOutlet UILabel *label2;
+@property (weak, nonatomic) IBOutlet UILabel *label3;
+@property (weak, nonatomic) IBOutlet UILabel *label4;
+@property (weak, nonatomic) IBOutlet UILabel *label5;
+@property (weak, nonatomic) IBOutlet UITextField *textField1;
+@property (weak, nonatomic) IBOutlet UITextField *textField2;
+@property (weak, nonatomic) IBOutlet UITextField *textField3;
+@property (weak, nonatomic) IBOutlet UITextField *textField4;
+@property (weak, nonatomic) IBOutlet UIImageView *upDownImageVIew;
+@property (weak, nonatomic) IBOutlet UILabel *price_lab;
+- (IBAction)rememberPasswordButtonClip:(id)sender;
+- (IBAction)submitSuplyButtobClip:(id)sender;
+- (IBAction)selectButtonCLip:(id)sender;
+
+@end
+
+@implementation DGetCashViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    [self.view setBackgroundColor:DBackColor_mine];
+    [self setNaviBarTitle:@"提现"];
+    [self addTableView:NO];
+    self.dMainTableView.delegate = self;
+    self.dMainTableView.dataSource = self;
+    CGRect frame = self.dMainTableView.frame;
+    frame.origin.x = self.cardLabel.frame.origin.x;
+    frame.origin.y = self.cardLabel.frame.origin.y + self.cardLabel.frame.size.height;
+    frame.size.width -= 28;
+    frame.size.height = 0;
+    [self.dMainTableView setFrame:frame];
+    self.dMainTableView.hidden = YES;
+    self.label2.text = self.totalAccount;
+    
+    self.label2.lineBreakMode = NSLineBreakByCharWrapping;
+    CGSize size1 = [self.label2 sizeThatFits:CGSizeMake(MAXFLOAT, self.label2.frame.size.height)];
+    self.label2.frame = CGRectMake(self.label2.frame.origin.x, self.label2.frame.origin.y, size1.width, self.label2.frame.size.height);
+    self.price_lab.frame = CGRectMake(self.label2.frame.origin.x + self.label2.frame.size.width +1, self.price_lab.frame.origin.y, self.price_lab.frame.size.width, self.price_lab.frame.size.height);
+    
+    _bankListFlag = NO;
+    self.textField2.secureTextEntry = YES;
+    [self configsProperty];
+}
+
+- (IBAction)rememberPasswordButtonClip:(id)sender {
+    DVerifyPhoneNumViewController *vc = [[DVerifyPhoneNumViewController alloc]initWithNibName:@"DVerifyPhoneNumViewController" bundle:nil];
+    vc.verigyTape = password2_verify;
+    NSDictionary *userInfoDic = [[NSDictionary alloc]init];
+    userInfoDic = [[FileOperation readFileToDictionary:dajikeUser]mutableCopy];
+    UserInfoModel *model = [[UserInfoModel alloc]init];
+    model = [JsonStringTransfer dictionary:userInfoDic ToModel:model];
+    vc.userModel = model;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+- (IBAction)submitSuplyButtobClip:(id)sender {
+    
+    [self myBanksTiXian];
+}
+
+- (IBAction)selectButtonCLip:(id)sender {
+    if (_bankListFlag) {
+        [UIView animateWithDuration:0.5 animations:^{
+            self.dMainTableView.hidden = NO;
+            CGRect frame = self.dMainTableView.frame;
+            frame.size.height = 0;
+            self.dMainTableView.frame = frame;
+            _bankListFlag = YES;
+            [self.upDownImageVIew setImage:[UIImage imageNamed:@"img_arrow_03_down.png"]];
+        }];
+        _bankListFlag = !_bankListFlag;
+    }else{
+        [self getMyBanksListData];
+    }
+    
+}
+- (BOOL)judgeFunction{
+    if (_selectedCardModel != nil&&
+        self.textField1.text != nil&&
+        self.textField2.text != nil&&
+        self.textField3.text != nil&&
+        self.textField4.text != nil) {
+        return YES;
+    }
+    [MBProgressHUD show:@"请检查信息是否填写正确！" icon:nil view:self.view afterDelay:0.7];
+    return NO;
+}
+
+- (void)getMyBanksListData{
+    
+    NSString *userId = [FileOperation getUserId];
+    NSDictionary *dic = [NSDictionary dictionaryWithObjectsAndKeys:userId,@"userId", nil];
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyBanks.list" parameters:dic ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        
+        if (responseObject.succeed == YES) {
+            NSArray *resultArr= [AnalysisData decodeAndDecriptWittDESArray:responseObject.result];
+            NSLog(@"%@",resultArr);
+            _bankDataArr = [[NSMutableArray alloc]init];
+            for (NSDictionary *dic in resultArr) {
+                BankBoundListModel *bankListItem = [[BankBoundListModel alloc]init];
+                bankListItem = [JsonStringTransfer dictionary:dic ToModel:bankListItem];
+                [_bankDataArr addObject:bankListItem];
+            }
+            
+            [UIView animateWithDuration:0.5 animations:^{
+                self.dMainTableView.hidden = NO;
+                CGRect frame = self.dMainTableView.frame;
+                frame.size.height = 30 * _bankDataArr.count;
+                self.dMainTableView.frame = frame;
+                _bankListFlag = !_bankListFlag;
+                [self.upDownImageVIew setImage:[UIImage imageNamed:@"img_arrow_03_up"]];
+            }];
+            
+            [self.dMainTableView reloadData];
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"operation = %@",operation);
+        NSLog(@"error = %@",error);
+    }];
+}
+- (void)myBanksTiXian{
+    NSDictionary *parameter = @{@"userId":[FileOperation getUserId],@"type":self.type,@"jine":self.textField1.text,@"bankId":_selectedCardModel.id,@"password":[DES3Util encrypt:self.textField2.text],@"shenfenzheng":self.textField3.text,@"tel":_selectedCardModel.tel};
+    
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyBanks.tixian" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            NSLog(@"result = %@",responseObject.result);
+            [ProgressHUD showMessage:@"请求成功，等待处理！" Width:100 High:80];
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+        else
+        {
+            if ([responseObject.msg length] == 0) {
+                [ProgressHUD showMessage:@"请求失败" Width:100 High:80];
+            }else
+                [ProgressHUD showMessage:responseObject.msg Width:100 High:80];
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+    
+}
+- (void)configsProperty{
+    NSDictionary *parameter = @{@"field":@"tixian"};
+    
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"Configs.property" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            NSLog(@"result = %@",responseObject.result);
+            NSDictionary *dict = [[NSDictionary alloc]init];
+            dict = responseObject.result;
+            self.textField1.placeholder = [NSString stringWithFormat:@"每日提现限额 ¥%@",[dict objectForKey:@"tixian" ]];
+        }
+        else
+        {
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+    
+}
+#pragma mark------
+#pragma mark------uitableViewDelegate uitableViewDatasource--------
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    
+    return _bankDataArr.count;
+    
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 30;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bankCell"];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bankCell"];
+        BankBoundListModel *model = [_bankDataArr objectAtIndex:indexPath.row];
+        UILabel *bankName = [[UILabel alloc]initWithFrame:CGRectMake(5, 10, 280, 20)];
+        bankName.text = [NSString stringWithFormat:@"%@  尾号:%@",model.bankName,[model.kahao substringFromIndex:model.kahao.length-4]];
+        bankName.font = [UIFont fontWithName:@"Arial" size:14.0];
+        [cell addSubview:bankName];
+        
+    }
+    return cell;
+}
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    //取消点击选中状态
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
+    _selectedCardModel = [_bankDataArr objectAtIndex:indexPath.row];
+    self.dMainTableView.hidden = YES;
+    self.cardLabel.text = [NSString stringWithFormat:@"%@  尾号:%@",_selectedCardModel.bankName,[_selectedCardModel.kahao substringFromIndex:_selectedCardModel.kahao.length-4]];
+    self.textField3.text = _selectedCardModel.shenfenzheng;
+    self.textField4.text = _selectedCardModel.tel;
+}
+
+
+
+
+
+
+
+
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

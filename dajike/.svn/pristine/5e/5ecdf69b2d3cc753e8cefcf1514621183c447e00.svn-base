@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7702" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="80" id="KGk-i7-Jjw" customClass="AllProductSortCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="80"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="男子" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vDz-gz-ouC">
+                        <rect key="frame" x="8" y="8" width="231" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="3fc-cX-Jtt"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.47450980392156861" green="0.47450980392156861" blue="0.47450980392156861" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sam-tg-2sg">
+                        <rect key="frame" x="247" y="8" width="65" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="3WP-Xv-aZY"/>
+                            <constraint firstAttribute="width" constant="65" id="bwz-6O-2V6"/>
+                        </constraints>
+                        <state key="normal" title="查看全部">
+                            <color key="titleColor" red="0.47450980392156861" green="0.47450980392156861" blue="0.47450980392156861" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            <color key="titleShadowColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        </state>
+                        <connections>
+                            <action selector="seachAllBtnAction:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="qXw-f9-afQ"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="trailing" secondItem="sam-tg-2sg" secondAttribute="trailing" constant="8" id="0Tq-5L-c0u"/>
+                    <constraint firstItem="sam-tg-2sg" firstAttribute="leading" secondItem="vDz-gz-ouC" secondAttribute="trailing" constant="8" id="3H2-W1-X5W"/>
+                    <constraint firstItem="sam-tg-2sg" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="X9X-a8-i2J"/>
+                    <constraint firstItem="vDz-gz-ouC" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="bja-iL-JHy"/>
+                    <constraint firstItem="vDz-gz-ouC" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="ktH-rf-P3I"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="allBtn" destination="sam-tg-2sg" id="9pm-s4-QUg"/>
+                <outlet property="btnCon" destination="bwz-6O-2V6" id="Hic-d8-t1g"/>
+                <outlet property="titleLb" destination="vDz-gz-ouC" id="PNc-RD-9ON"/>
+            </connections>
+            <point key="canvasLocation" x="254" y="440"/>
+        </tableViewCell>
+    </objects>
+</document>

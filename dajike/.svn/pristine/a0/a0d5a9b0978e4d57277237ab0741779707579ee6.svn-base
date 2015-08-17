@@ -1,0 +1,96 @@
+//
+//  DShouyeZIyingViewController.m
+//  dajike
+//
+//  Created by dajike on 15/7/17.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DShouyeZIyingViewController.h"
+#import "SCNavTabBarController.h"
+#import "DTuijianGoogsViewController.h"
+#import "dDefine.h"
+
+@interface DShouyeZIyingViewController ()
+
+@end
+
+@implementation DShouyeZIyingViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setNaviBarTitle:@"大集客自营"];
+    
+    DImgButton *searchButton= [DBaseNavView createNavBtnWithImgNormal:@"img_pub_01" imgHighlight:@"img_pub_01" imgSelected:@"img_pub_01" target:self action:@selector(navRightButtonTapped:)];
+    
+    [self setNaviBarRightBtn:searchButton];
+//    [self addTableView:NO];
+//    self.dMainTableView.delegate = self;
+//    self.dMainTableView.dataSource = self;searchButton
+    
+    DTuijianGoogsViewController *oneViewController = [[DTuijianGoogsViewController alloc] init];
+    oneViewController.title = @"推荐商品";
+    oneViewController.isTuijian = YES;
+    oneViewController.view.backgroundColor = [UIColor brownColor];
+    
+    DTuijianGoogsViewController *twoViewController = [[DTuijianGoogsViewController alloc] init];
+    twoViewController.title = @"体育";
+    twoViewController.view.backgroundColor = [UIColor purpleColor];
+    
+    DTuijianGoogsViewController *threeViewController = [[DTuijianGoogsViewController alloc] init];
+    threeViewController.title = @"娱乐八卦";
+    threeViewController.view.backgroundColor = [UIColor orangeColor];
+    
+    DTuijianGoogsViewController *fourViewController = [[DTuijianGoogsViewController alloc] init];
+    fourViewController.title = @"天府之国";
+    fourViewController.view.backgroundColor = [UIColor magentaColor];
+    
+    DTuijianGoogsViewController *fiveViewController = [[DTuijianGoogsViewController alloc] init];
+    fiveViewController.title = @"四川省";
+    fiveViewController.view.backgroundColor = [UIColor yellowColor];
+    
+    DTuijianGoogsViewController *sixViewController = [[DTuijianGoogsViewController alloc] init];
+    sixViewController.title = @"政治";
+    sixViewController.view.backgroundColor = [UIColor cyanColor];
+    
+    DTuijianGoogsViewController *sevenViewController = [[DTuijianGoogsViewController alloc] init];
+    sevenViewController.title = @"国际新闻";
+    sevenViewController.view.backgroundColor = [UIColor blueColor];
+    
+    DTuijianGoogsViewController *eightViewController = [[DTuijianGoogsViewController alloc] init];
+    eightViewController.title = @"自媒体";
+    eightViewController.view.backgroundColor = [UIColor greenColor];
+    
+    DTuijianGoogsViewController *ninghtViewController = [[DTuijianGoogsViewController alloc] init];
+    ninghtViewController.title = @"科技";
+    ninghtViewController.view.backgroundColor = [UIColor redColor];
+    
+    SCNavTabBarController *navTabBarController = [[SCNavTabBarController alloc] init];
+    navTabBarController.subViewControllers = @[oneViewController, twoViewController, threeViewController, fourViewController, fiveViewController, sixViewController, sevenViewController, eightViewController, ninghtViewController];
+    //    navTabBarController.showArrowButton = YES;
+    [navTabBarController addParentController:self];
+
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)navRightButtonTapped:(id)sender
+{
+    //    [[SlideNavigationController sharedInstance] toggleRightMenu];
+    NSLog(@"%s",__func__);
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

@@ -1,0 +1,124 @@
+//
+//  DShouyeZIyingViewController.m
+//  dajike
+//
+//  Created by dajike on 15/7/17.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DShouyeZIyingViewController.h"
+#import "SCNavTabBarController.h"
+#import "DTuijianGoogsViewController.h"
+#import "dDefine.h"
+#import "DZiyingsCategoryModel.h"
+#import "DGoodsListViewController.h"
+
+@interface DShouyeZIyingViewController ()
+{
+    NSMutableArray *VCArr;
+}
+
+@end
+
+@implementation DShouyeZIyingViewController
+
+- (void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:YES];
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    [self setNaviBarTitle:@"大集客自营"];
+    
+    DImgButton *searchButton= [DBaseNavView createNavBtnWithImgNormal:@"img_pub_01" imgHighlight:@"img_pub_01" imgSelected:@"img_pub_01" target:self action:@selector(navRightButtonTapped:)];
+    
+    [self setNaviBarRightBtn:searchButton];
+//    [self addTableView:NO];
+//    self.dMainTableView.delegate = self;
+//    self.dMainTableView.dataSource = self;searchButton
+    VCArr = [[NSMutableArray alloc]init];
+    
+    DTuijianGoogsViewController *oneViewController = [[DTuijianGoogsViewController alloc] init];
+    oneViewController.title = @"推荐商品";
+    oneViewController.isTuijian = YES;
+    oneViewController.view.backgroundColor = DColor_a0a0a0;
+    [VCArr addObject:oneViewController];
+    
+
+    for (DZiyingsCategoryModel *model in self.ziyingLIst) {
+        DTuijianGoogsViewController *twoViewController = [[DTuijianGoogsViewController alloc] init];
+        twoViewController.title = model.cateName;
+        twoViewController.ziyingModel = model;
+        twoViewController.view.backgroundColor = DColor_a0a0a0;
+        [VCArr addObject:twoViewController];
+    }
+    
+    SCNavTabBarController *navTabBarController = [[SCNavTabBarController alloc] init];
+    navTabBarController.subViewControllers = VCArr;
+    //    navTabBarController.showArrowButton = YES;
+    [navTabBarController addParentController:self];
+    
+//    DTuijianGoogsViewController *one1ViewController = [[DTuijianGoogsViewController alloc] init];
+//    one1ViewController.title = @"推荐商品";
+////    one1ViewController.isTuijian = YES;
+//    one1ViewController.view.backgroundColor = DColor_a0a0a0;
+//    [VCArr addObject:one1ViewController];
+    
+//    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"ZiYings.category" parameters:nil ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+//        if (responseObject.succeed) {
+//            for (NSDictionary * dic in responseObject.result) {
+//                DZiyingsCategoryModel *ziyingCaModel = [[DZiyingsCategoryModel alloc]init];
+//                ziyingCaModel = [JsonStringTransfer dictionary:dic ToModel:ziyingCaModel];
+//                DTuijianGoogsViewController *twoViewController = [[DTuijianGoogsViewController alloc] init];
+//                twoViewController.title = ziyingCaModel.cateName;
+//                twoViewController.ziyingModel = ziyingCaModel;
+//                twoViewController.view.backgroundColor = DColor_a0a0a0;
+//                [VCArr addObject:twoViewController];
+//            }
+//            
+//        }
+//        
+//        navTabBarController.subViewControllers = VCArr;
+//        //    navTabBarController.showArrowButton = YES;
+//        [navTabBarController addParentController:self];
+//    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+//
+//        navTabBarController.subViewControllers = VCArr;
+//        //    navTabBarController.showArrowButton = YES;
+//        [navTabBarController addParentController:self];
+//        
+//    }];
+    
+    
+//    navTabBarController.subViewControllers = VCArr;
+//    //    navTabBarController.showArrowButton = YES;
+//    [navTabBarController addParentController:self];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)navRightButtonTapped:(id)sender
+{
+    //    [[SlideNavigationController sharedInstance] toggleRightMenu];
+    NSLog(@"%s",__func__);
+    //搜索
+    DGoodsListViewController *goodsListVC = [[DGoodsListViewController alloc] init];
+    //        goodsListVC.cateId = [NSString stringWithFormat:@"%@",((DReXiaoGoodsModel *)[titleArr objectAtIndex:tag]).cate_id];
+    //这里必须先取值，再写入   因为每次搜索都将最新的搜索值插入数组最前端
+    [self.navigationController pushViewController:goodsListVC animated:YES];
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

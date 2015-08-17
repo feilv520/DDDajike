@@ -1,0 +1,31 @@
+//
+//  DOrderThirdCell.m
+//  dajike
+//
+//  Created by swb on 15/7/16.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DOrderThirdCell.h"
+
+@implementation DOrderThirdCell
+
+- (void)awakeFromNib {
+    // Initialization code
+    self.lineViewCon.constant = 0.5f;
+}
+
+- (void)setModel:(DMyOrderModel *)model
+{
+    self.allMoneyLb.text = [NSString stringWithFormat:@"¥%.2f",[model.order_amount floatValue]];
+    self.yunfeiLb.text = [NSString stringWithFormat:@"¥%.2f",[model.shipping_fee floatValue]];
+//    self.yueLb.text = [NSString stringWithFormat:@"¥%.2f",[model.]]
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

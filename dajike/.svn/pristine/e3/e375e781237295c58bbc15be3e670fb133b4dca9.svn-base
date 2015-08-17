@@ -1,0 +1,32 @@
+//
+//  DGouWuCheOperation.m
+//  dajike
+//
+//  Created by swb on 15/7/23.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DGouWuCheOperation.h"
+#import "FMDatabase.h"
+
+@implementation DGouWuCheOperation
+
++ (void)addIntoGouWuChe:(DGoodsDetailModel *)model
+{
+    FMDatabase *db = [FMDatabase databaseWithPath:[[self class] createDataBase]] ;
+    if (![db open]) {
+        NSLog(@"Could not open db.");
+        return ;
+    }
+    [db executeUpdate:@"CREATE TABLE IF NOT EXISTS AddGouWuChe (goodsId integer  primary key autoincrement,regionId integer, parentId integer, regionName text, pingyinName text)"];
+}
+//数据库存放路径
+- (NSString *)createDataBase
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [paths objectAtIndex:0];
+    NSString *dbPath = [documentDirectory stringByAppendingPathComponent:@"GouWuChe.db"];
+    return dbPath;
+}
+
+@end

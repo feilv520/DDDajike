@@ -1,0 +1,167 @@
+//
+//  DCollectGoodCell.m
+//  dajike
+//
+//  Created by songjw on 15/7/16.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DCollectGoodCell.h"
+#import "commonTools.h"
+#import "dDefine.h"
+@implementation DCollectGoodCell
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+UIImageView *headImgV;
+//@property (weak, nonatomic) IBOutlet UILabel *nameLab;
+//@property (weak, nonatomic) IBOutlet UILabel *priceLab;
+//@property (weak, nonatomic) IBOutlet UILabel *price_Lab;
+//@property (weak, nonatomic) IBOutlet UILabel *precentLab;
+//@property (weak, nonatomic) IBOutlet UILabel *feeLab;
+//@property (weak, nonatomic) IBOutlet UILabel *evaluatersLab;
+
+//"add_time" = 1413439853;
+//"choujiang_bili" = 1;
+//"default_image" = "http://img01.mandi.net.cn/data/files/2013/1007/111_201310071441078091.jpg";
+//"goods_id" = 4419;
+//"goods_name" = "\U6052\U5bff\U5802 \U5375\U78f7\U810260\U7c92+\U6df1\U6d77\U91d1\U67aa\U9c7c\U6cb9120\U7c92\U793c\U76d2\U88c5";
+//"item_id" = 4419;
+//"market_price" = 0;
+//price = "159.6";
+//sales = 0;
+//"store_name" = "\U4e0a\U6d77\U6052\U5bff\U5802\U5065\U5eb7\U98df\U54c1\U516c\U53f8";
+//type = material;
+- (void)setGoodModel:(DCollectGoodModel *)goodModel{
+    self.nameLab.text = goodModel.goods_name;
+    self.priceLab.text = [NSString stringWithFormat:@"%d",[goodModel.price intValue]];
+    float a = [goodModel.price floatValue];
+    a = a*100;
+    int b = a;
+    b = b % 100;
+    if (b == 0){
+        self.price_Lab.text = @".00";
+    }else{
+        self.price_Lab.text = [NSString stringWithFormat:@".%d",b];
+    }
+    
+    
+    self.precentLab.text = [NSString stringWithFormat:@"%.0f好评",[goodModel.choujiang_bili floatValue]*100];
+    
+//    self.nameLab.numberOfLines = 0;
+//    self.nameLab.lineBreakMode = NSLineBreakByCharWrapping;
+//    CGSize size = [self.nameLab sizeThatFits:CGSizeMake(self.nameLab.frame.size.width, MAXFLOAT)];
+//    self.nameLab.frame = CGRectMake(self.nameLab.frame.origin.x, self.nameLab.frame.origin.y, self.nameLab.frame.size.width, size.height);
+    
+    self.priceLab.lineBreakMode = NSLineBreakByCharWrapping;
+    CGSize size1 = [self.priceLab sizeThatFits:CGSizeMake(MAXFLOAT, self.priceLab.frame.size.height)];
+    self.priceLab.frame = CGRectMake(self.priceLab.frame.origin.x, self.priceLab.frame.origin.y, size1.width, self.priceLab.frame.size.height);
+    self.price_Lab.frame = CGRectMake(self.priceLab.frame.origin.x + self.priceLab.frame.size.width +1, self.priceLab.frame.origin.y, self.price_Lab.frame.size.width, 21);
+    if ([goodModel.yunfei isEqualToString:@"免运费"]) {
+        self.feeLab.text = goodModel.yunfei;
+    }else{
+        self.feeLab.text = [NSString stringWithFormat:@"运费:%@元",goodModel.yunfei];
+    }
+    
+    self.evaluatersLab.text = [NSString stringWithFormat:@"评论%@条",goodModel.haoping];
+    [self.headImgV.layer setMasksToBounds:YES];
+    [self.headImgV.layer setCornerRadius:4.0];
+    [self.headImgV setImageWithURL:[commonTools getImgURL:goodModel.default_image] placeholderImage:DPlaceholderImage];
+    
+}
+
+- (void) setCheckImageViewCenter:(CGPoint)pt alpha:(CGFloat)alpha animated:(BOOL)animated
+{
+    if (animated)
+    {
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationBeginsFromCurrentState:YES];
+        [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+        [UIView setAnimationDuration:0.3];
+        
+        m_checkImageView.center = pt;
+        m_checkImageView.alpha = alpha;
+        
+        [UIView commitAnimations];
+    }
+    else
+    {
+        m_checkImageView.center = pt;
+        m_checkImageView.alpha = alpha;
+    }
+}
+
+- (void) setEditing:(BOOL)editting animated:(BOOL)animated
+{
+    if (self.editing == editting)
+    {
+        return;
+    }
+    
+    [super setEditing:editting animated:animated];
+    
+    if (editting)
+    {
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        self.backgroundView = [[UIView alloc] init];
+        self.backgroundView.backgroundColor = [UIColor whiteColor];
+        self.textLabel.backgroundColor = [UIColor clearColor];
+        self.detailTextLabel.backgroundColor = [UIColor clearColor];
+        
+        if (m_checkImageView == nil)
+        {
+            m_checkImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"img_no_selected.png"]];
+            [self addSubview:m_checkImageView];
+        }
+        
+        [self setChecked:m_checked];
+        m_checkImageView.center = CGPointMake(-CGRectGetWidth(m_checkImageView.frame) * 0.5,
+                                              CGRectGetHeight(self.bounds) * 0.5);
+        m_checkImageView.alpha = 0.0;
+        CGRect frame = m_checkImageView.frame;
+        frame.size.width = 16;
+        frame.size.height = 15;
+        m_checkImageView.frame = frame;
+        [self setCheckImageViewCenter:CGPointMake(20.5, CGRectGetHeight(self.bounds) * 0.5)
+                                alpha:1.0 animated:animated];
+    }
+    else
+    {
+        m_checked = NO;
+        self.selectionStyle = UITableViewCellSelectionStyleBlue;
+        self.backgroundView = nil;
+        
+        if (m_checkImageView)
+        {
+            [self setCheckImageViewCenter:CGPointMake(-CGRectGetWidth(m_checkImageView.frame) * 0.5,
+                                                      CGRectGetHeight(self.bounds) * 0.5)
+                                    alpha:0.0
+                                 animated:animated];
+        }
+    }
+}
+
+
+- (void) setChecked:(BOOL)checked
+{
+    if (checked)
+    {
+        m_checkImageView.image = [UIImage imageNamed:@"img_selected.png"];
+        self.backgroundView.backgroundColor = [UIColor colorWithRed:223.0/255.0 green:230.0/255.0 blue:250.0/255.0 alpha:1.0];
+    }
+    else
+    {
+        m_checkImageView.image = [UIImage imageNamed:@"img_no_selected.png"];
+        self.backgroundView.backgroundColor = [UIColor whiteColor];
+    }
+    m_checked = checked;
+}
+
+@end

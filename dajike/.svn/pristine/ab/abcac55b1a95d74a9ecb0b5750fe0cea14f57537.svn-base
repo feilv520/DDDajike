@@ -1,0 +1,166 @@
+//
+//  DProductBuySuccessViewController.m
+//  dajike
+//
+//  Created by swb on 15/7/22.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DProductBuySuccessViewController.h"
+#import "dDefine.h"
+//cell
+#import "DBuySuccessCell.h"
+#import "DOrderAddressCell.h"
+#import "DBuySeccess1Cell.h"
+//model
+#import "OrdersDetailModel.h"
+//controller
+#import "DOrderDetailViewController.h"
+
+@interface DProductBuySuccessViewController ()<UITableViewDataSource,UITableViewDelegate>
+{
+    OrdersDetailModel *_orderDetailModel;
+}
+
+@end
+
+@implementation DProductBuySuccessViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [self setNaviBarTitle:@"购买成功"];
+    self.view.backgroundColor = DColor_f6f1ef;
+    _orderDetailModel = [[OrdersDetailModel alloc]init];
+    [self addTableView:NO];
+    self.dMainTableView.delegate = self;
+    self.dMainTableView.dataSource = self;
+    [self initCreateBottomFooterView];
+    [self getOrderDetail];
+}
+//获取订单详情
+- (void)getOrderDetail
+{
+    NSDictionary *parameter = [NSDictionary dictionaryWithObjectsAndKeys:get_userId,@"userId",_orderId,@"orderId", @"buyer",@"type", nil];
+    
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyOrders.detail" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        NSLog(@"operation6 = %@",operation);
+        if (responseObject.succeed) {
+            NSLog(@"result = %@",responseObject.result);
+            _orderDetailModel = [JsonStringTransfer dictionary:responseObject.result ToModel:_orderDetailModel];
+            [self.dMainTableView reloadData];
+        }else
+            showMessage(responseObject.msg);
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+    }];
+}
+
+//初始化创建底部按钮
+- (void)initCreateBottomFooterView
+{
+    UIView *viewBg = [self.view createViewWithFrame:DRect(0, 0, DWIDTH_CONTROLLER_DEFAULT, 100) andBackgroundColor:DColor_Clear];
+    
+    UIButton *btn1 = [self.view createButtonWithFrame:DRect(DWIDTH_CONTROLLER_DEFAULT/2-140, 30, 120, 40) andBackImageName:nil andTarget:self andAction:@selector(btnClicked:) andTitle:@"订单详情" andTag:909];
+    btn1.backgroundColor = DColor_c4291f;
+    [btn1 setTitleColor:DColor_White forState:UIControlStateNormal];
+    btn1.titleLabel.font = DFont_15b;
+    [viewBg addSubview:btn1];
+    
+    UIButton *btn2 = [self.view createButtonWithFrame:DRect(DWIDTH_CONTROLLER_DEFAULT/2+20, 30, 120, 40) andBackImageName:nil andTarget:self andAction:@selector(btnClicked:) andTitle:@"去首页逛逛" andTag:910];
+    btn2.backgroundColor = DColor_c4291f;
+    [btn2 setTitleColor:DColor_White forState:UIControlStateNormal];
+    btn2.titleLabel.font = DFont_15b;
+    [viewBg addSubview:btn2];
+    
+    self.dMainTableView.tableFooterView = viewBg;
+}
+- (void)btnClicked:(UIButton *)btn
+{
+    if (btn.tag == 909) {
+        //去订单详情
+        //商品
+        DOrderDetailViewController *vc = [[DOrderDetailViewController alloc]init];
+        vc.goodsDetailModel = self.goodDetailModel;
+        vc.orderIdStr = self.orderId;
+        vc.productArr = self.mArr;
+        [vc callback:^{
+            NSLog(@"石头人");
+        }];
+        push(vc);
+    }
+    if (btn.tag == 910) {
+        //去首页逛逛
+        [self.navigationController popToRootViewControllerAnimated:YES];
+    }
+}
+
+#pragma mark  tableView  delegate  &&  dataSource
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 3;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.5f;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0.5f;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0) {
+        return 90;
+    }
+    if (indexPath.row == 1) {
+        return 70;
+    }
+    if (indexPath.row == 2) {
+        return 60;
+    }
+    return 0;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0) {
+        DBuySuccessCell *myCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DBuySuccessCell class]];
+        return myCell;
+    }
+    if (indexPath.row == 1) {
+        DOrderAddressCell *myCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DOrderAddressCell class]];
+        myCell.model = _orderDetailModel;
+        return myCell;
+    }
+    if (indexPath.row == 2) {
+        DBuySeccess1Cell *myCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DBuySeccess1Cell class]];
+        myCell.model = _orderDetailModel;
+        return myCell;
+    }
+    return nil;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

@@ -1,0 +1,21 @@
+//
+//  DGouWuCheOperation.h
+//  dajike
+//
+//  Created by swb on 15/7/23.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "DGoodsDetailModel.h"
+
+@interface DGouWuCheOperation : NSObject
+//获取数据库
++ (NSString *)getDatabasePath;
+//添加到本地购物车
++ (void)addIntoGouWuChe:(DGoodsDetailModel *)model;
+//遍历购物车
++ (NSMutableDictionary *)traverseGouWuChe;
++ (NSMutableDictionary *)syncGouWuChe;
+
+@end

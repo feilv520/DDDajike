@@ -1,0 +1,37 @@
+//
+//  DJFenModel.h
+//  dajike
+//
+//  Created by apple on 15/7/27.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+@interface DJFenModel : NSObject
+
+@property (nonatomic, assign) NSInteger comments;
+
+@property (nonatomic, copy) NSString *default_image;
+
+@property (nonatomic, assign) NSInteger sales;
+
+@property (nonatomic, assign) NSInteger goods_id;
+
+@property (nonatomic, assign) NSInteger goodcommentrate;
+
+@property (nonatomic, assign) NSInteger freight;
+
+@property (nonatomic, assign) NSInteger sort_order;
+
+@property (nonatomic, copy) NSString *goods_name;
+
+@property (nonatomic, assign) NSInteger if_jifen;
+
+@property (nonatomic, assign) NSInteger add_time;
+
+@property (nonatomic, copy) NSString *store_id;
+
+@property (nonatomic, copy) NSString *被收藏数;
+
+@end

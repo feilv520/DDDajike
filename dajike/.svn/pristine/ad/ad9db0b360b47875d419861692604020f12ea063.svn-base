@@ -1,0 +1,75 @@
+//
+//  DProductOrderCell.m
+//  dajike
+//
+//  Created by swb on 15/7/14.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DProductOrderCell.h"
+#import "dDefine.h"
+
+@implementation DProductOrderCell
+
+- (void)awakeFromNib {
+    // Initialization code
+    self.goodImg.layer.cornerRadius = 6.0f;
+    self.goodImg.layer.masksToBounds = YES;
+}
+
+- (void)setOrderGoodModel:(orderGoodsModel *)orderGoodModel
+{
+    [self.goodImg setImageWithURL:[commonTools getImgURL:orderGoodModel.goods_image] placeholderImage:DPlaceholderImage];
+    self.goodName.text = orderGoodModel.goods_name;
+    self.goodSepcLb.text = [NSString stringWithFormat:@"%@",orderGoodModel.specification];
+    self.goodsNumLb.text = [NSString stringWithFormat:@"x%d",[orderGoodModel.quantity intValue]];
+    if ([orderGoodModel.jifen intValue] == 0) {
+        self.goodPriceLb.text = [NSString stringWithFormat:@"¥%.2f",[orderGoodModel.price floatValue]];
+    }else
+        self.goodPriceLb.text = [NSString stringWithFormat:@"%d积分",[orderGoodModel.jifen intValue]];
+}
+
+- (void)setGoodsDetailModel:(DGoodsDetailModel *)goodsDetailModel
+{
+    [self.goodImg setImageWithURL:[commonTools getImgURL:goodsDetailModel.goodsDefaultImage] placeholderImage:DPlaceholderImage];
+    self.goodName.text = goodsDetailModel.goodsName;
+    if ([commonTools isNull:goodsDetailModel.spec1] && [commonTools isNull:goodsDetailModel.specName1] && [commonTools isNull:goodsDetailModel.specName2] && [commonTools isNull:goodsDetailModel.spec2]) {
+        self.goodSepcLb.text = @"";
+    }else if ([commonTools isNull:goodsDetailModel.specName1]) {
+        self.goodSepcLb.text = [NSString stringWithFormat:@"%@:%@",goodsDetailModel.specName2,goodsDetailModel.spec2];
+    }else if ([commonTools isNull:goodsDetailModel.specName2]) {
+        self.goodSepcLb.text = [NSString stringWithFormat:@"%@:%@",goodsDetailModel.specName1,goodsDetailModel.spec1];
+    }else {
+        self.goodSepcLb.text = [NSString stringWithFormat:@"%@:%@   %@:%@",goodsDetailModel.specName1,goodsDetailModel.spec1,goodsDetailModel.specName2,goodsDetailModel.spec2];
+    }
+    
+    self.goodsNumLb.text = [NSString stringWithFormat:@"x%d",[self.buyNum intValue]];
+    if ([goodsDetailModel.ifJifen intValue] == 0) {
+        self.goodPriceLb.text = [NSString stringWithFormat:@"¥%.2f",[goodsDetailModel.goodsPrice floatValue]];
+    }else
+        self.goodPriceLb.text = [NSString stringWithFormat:@"%d积分",[goodsDetailModel.ifJifen intValue]];
+}
+- (void)setDic:(NSMutableDictionary *)dic
+{
+    [self.goodImg setImageWithURL:[commonTools getImgURL:[dic objectForKey:@"goodsDefaultImage"]] placeholderImage:DPlaceholderImage];
+    self.goodName.text = [dic objectForKey:@"goodsName"];
+    if ([commonTools isNull:[dic objectForKey:@"spec1"]] && [commonTools isNull:[dic objectForKey:@"specName1"]] && [commonTools isNull:[dic objectForKey:@"spec2"]] && [commonTools isNull:[dic objectForKey:@"specName2"]]) {
+        self.goodSepcLb.text = @"";
+    }else if ([commonTools isNull:[dic objectForKey:@"specName1"]]) {
+        self.goodSepcLb.text = [NSString stringWithFormat:@"%@:%@",[dic objectForKey:@"specName2"],[dic objectForKey:@"spec2"]];
+    }else if ([commonTools isNull:[dic objectForKey:@"specName2"]]) {
+        self.goodSepcLb.text = [NSString stringWithFormat:@"%@:%@",[dic objectForKey:@"specName1"],[dic objectForKey:@"spec1"]];
+    }else {
+        self.goodSepcLb.text = [NSString stringWithFormat:@"%@:%@   %@:%@",[dic objectForKey:@"specName1"],[dic objectForKey:@"spec1"],[dic objectForKey:@"specName2"],[dic objectForKey:@"spec2"]];
+    }
+    self.goodsNumLb.text = [NSString stringWithFormat:@"x%d",[[dic objectForKey:@"number"] intValue]];
+    self.goodPriceLb.text = [NSString stringWithFormat:@"¥%.2f",[[dic objectForKey:@"goodsPrice"] floatValue]];
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

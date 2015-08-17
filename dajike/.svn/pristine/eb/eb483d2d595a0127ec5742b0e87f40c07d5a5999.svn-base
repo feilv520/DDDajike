@@ -1,0 +1,17 @@
+//
+//  DJiFenShopTableViewCell.h
+//  dajike
+//
+//  Created by apple on 15/7/21.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface DJiFenShopTableViewCell : UITableViewCell
+@property (strong, nonatomic) IBOutlet UILabel *nameLabel;
+@property (strong, nonatomic) IBOutlet UILabel *fenNumber;
+@property (strong, nonatomic) IBOutlet UIButton *collectionButton;
+@property (strong, nonatomic) IBOutlet UILabel *collectionLabel;
+
+@end

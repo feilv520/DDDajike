@@ -1,0 +1,165 @@
+//
+//  DConfirmOrderViewController.m
+//  dajike
+//
+//  Created by swb on 15/7/22.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DConfirmOrderViewController.h"
+#import "dDefine.h"
+//cell
+#import "DOrderAddressCell.h"
+#import "DConfirmOrder1Cell.h"
+#import "DConfirmOrder2Cell.h"
+#import "DConfirmOrder3Cell.h"
+
+@interface DConfirmOrderViewController ()<UITableViewDataSource,UITableViewDelegate>
+{
+    UILabel     *_moneyLb;//实付款
+    UILabel     *_yunfeiLb;//运费
+}
+
+@end
+
+@implementation DConfirmOrderViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [self setNaviBarTitle:@"确认订单"];
+    [self addTableView:NO];
+    self.dMainTableView.delegate = self;
+    self.dMainTableView.dataSource = self;
+    self.dMainTableView.frame = DRect(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT-60-44);
+    [self setBottomView];
+}
+//初始化创建屏幕底部的view
+- (void)setBottomView
+{
+    UIView *viewBg = [self.view createViewWithFrame:DRect(0, DHEIGHT_CONTROLLER_DEFAULT-60, DWIDTH_CONTROLLER_DEFAULT, 60) andBackgroundColor:DColor_White];
+    [self.view addSubview:viewBg];
+    
+    UIView *lineView = [self.view createViewWithFrame:DRect(0, 0, DWIDTH_CONTROLLER_DEFAULT, 0.5) andBackgroundColor:DColor_line_bg];
+    [viewBg addSubview:lineView];
+    
+    UILabel *lb1 = [self.view creatLabelWithFrame:DRect(10, 5, 55, 20) AndFont:13.0f AndBackgroundColor:DColor_Clear AndText:@"实付款：" AndTextAlignment:NSTextAlignmentLeft AndTextColor:DColor_666666 andCornerRadius:0.0f];
+    [viewBg addSubview:lb1];
+    
+    _moneyLb = [self.view creatLabelWithFrame:DRect(CGRectGetMaxX(lb1.frame), 5, 160, 20) AndFont:13.0f AndBackgroundColor:DColor_Clear AndText:@"¥777" AndTextAlignment:NSTextAlignmentLeft AndTextColor:DColor_c4291f andCornerRadius:0.0f];
+    [viewBg addSubview:_moneyLb];
+    
+    UILabel *lb2 = [self.view creatLabelWithFrame:DRect(CGRectGetMinX(lb1.frame), CGRectGetMaxY(lb1.frame)+5, CGRectGetWidth(lb1.frame), 20) AndFont:13.0f AndBackgroundColor:DColor_Clear AndText:@"含运费：" AndTextAlignment:NSTextAlignmentLeft AndTextColor:DColor_999999 andCornerRadius:0.0f];
+    [viewBg addSubview:lb2];
+    
+    _yunfeiLb = [self.view creatLabelWithFrame:DRect(CGRectGetMaxX(lb2.frame), CGRectGetMinY(lb2.frame), 160, 20) AndFont:13.0f AndBackgroundColor:DColor_Clear AndText:@"10.00" AndTextAlignment:NSTextAlignmentLeft AndTextColor:DColor_999999 andCornerRadius:0.0f];
+    [viewBg addSubview:_yunfeiLb];
+    
+    UIButton *btn = [self.view createButtonWithFrame:DRect(DWIDTH_CONTROLLER_DEFAULT-110, 12, 100, 36) andBackImageName:nil andTarget:self andAction:@selector(okBtn:) andTitle:@"确认" andTag:112];
+    btn.backgroundColor = DColor_c4291f;
+    [btn setTitleColor:DColor_White forState:UIControlStateNormal];
+    btn.layer.cornerRadius = 3.5f;
+    btn.layer.masksToBounds = YES;
+    btn.titleLabel.font = DFont_15b;
+    [viewBg addSubview:btn];
+}
+//确认
+- (void)okBtn:(UIButton *)btn
+{
+    
+}
+
+#pragma mark  tableView  delegate  &&  dataSource
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 4;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0) {
+        return 70;
+    }
+    if (indexPath.row == 1) {
+        return 140;
+    }
+    if (indexPath.row == 2) {
+        return 40;
+    }
+    if (indexPath.row == 3) {
+        return 65;
+    }
+    return 0;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0) {
+        DOrderAddressCell *myCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DOrderAddressCell class]];
+        myCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        return myCell;
+    }
+    if (indexPath.row == 1) {
+        DConfirmOrder1Cell *myCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DConfirmOrder1Cell class]];
+        [myCell callBack:^{
+            NSLog(@"点击cell");
+        }];
+        return myCell;
+    }
+    if (indexPath.row == 2) {
+        DConfirmOrder2Cell *myCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DConfirmOrder2Cell class]];
+        [myCell callBack:^(NSInteger btnTag) {
+            if (btnTag == 2) {
+                NSLog(@"减-------");
+            }
+            if (btnTag == 3) {
+                NSLog(@"加+++++++");
+            }
+        }];
+        return myCell;
+    }
+    if (indexPath.row == 3) {
+        DConfirmOrder3Cell *myCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DConfirmOrder3Cell class]];
+        [myCell callBack:^(NSInteger btnTag) {
+            if (btnTag == 1) {
+                NSLog(@"选择收益");
+            }
+            if (btnTag == 2) {
+                NSLog(@"选择充值");
+            }
+        }];
+        return myCell;
+    }
+    return nil;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

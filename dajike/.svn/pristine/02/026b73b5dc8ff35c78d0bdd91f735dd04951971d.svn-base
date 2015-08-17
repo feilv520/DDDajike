@@ -1,0 +1,40 @@
+//
+//  DEdittingAddressViewController.h
+//  dajike
+//
+//  Created by swb on 15/7/13.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+
+
+/*
+ ********   编辑、新增  收货地址
+ */
+
+#import "DBackNavigationViewController.h"
+#import "MyAddressModel.h"
+
+typedef void (^AddressManageBlock)(int flag,MyAddressModel *addressModel);
+
+@interface DEdittingAddressViewController : DBackNavigationViewController
+
+@property (strong, nonatomic) NSString *comefrom;
+@property (strong, nonatomic) NSString *flagStr;//1.新增收货地址    2.编辑收货地址
+@property (strong, nonatomic) MyAddressModel *model;
+@property (weak, nonatomic) IBOutlet UITextField *nameTF;
+@property (weak, nonatomic) IBOutlet UITextField *phoneTF;
+@property (weak, nonatomic) IBOutlet UITextField *mobileTF;
+@property (weak, nonatomic) IBOutlet UITextField *codeTF;
+@property (weak, nonatomic) IBOutlet UITextField *areaTF;
+@property (weak, nonatomic) IBOutlet UITextField *detailAddress;
+@property (weak, nonatomic) IBOutlet UIPickerView *placePickerView;
+
+@property (weak, nonatomic) IBOutlet UIButton *saveBtn;
+@property (strong, nonatomic) AddressManageBlock block;
+
+- (IBAction)saveBtnActino:(id)sender;
+- (void)callBackAddressEdit:(AddressManageBlock)block;
+- (IBAction)selectPlaceAction:(id)sender;
+
+@end

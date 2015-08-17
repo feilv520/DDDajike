@@ -1,0 +1,85 @@
+//
+//  DProductQingDanViewController.m
+//  dajike
+//
+//  Created by swb on 15/7/16.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DProductQingDanViewController.h"
+#import "dDefine.h"
+//cell
+#import "DProductOrderCell.h"
+//controller
+#import "DWebViewController.h"
+
+@interface DProductQingDanViewController ()<UITableViewDataSource,UITableViewDelegate>
+
+@end
+
+@implementation DProductQingDanViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [self setNaviBarTitle:@"商品清单"];
+    [self addTableView:NO];
+    self.dMainTableView.delegate = self;
+    self.dMainTableView.dataSource = self;
+}
+
+#pragma mark tableView datasource & delegate
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return self.productArr.count;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 75;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    DProductOrderCell *myCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DProductOrderCell class]];
+    myCell.dic = [[self.productArr objectAtIndex:indexPath.row]mutableCopy];
+    return myCell;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    //跳商品详情
+    DWebViewController *vc = [[DWebViewController alloc]init];
+    vc.isHelp = 6;
+    vc.urlStr = [NSString stringWithFormat:@"goodsId=%d&userId=%@",[[[self.productArr objectAtIndex:indexPath.row] objectForKey:@"goodsId"] intValue],get_userId];
+    vc.imageUrl = [NSString stringWithFormat:@"%@",[[self.productArr objectAtIndex:indexPath.row] objectForKey:@"goodsDefaultImage"]];
+    vc.googsTitle = [NSString stringWithFormat:@"%@",[[self.productArr objectAtIndex:indexPath.row] objectForKey:@"goodsName"]];
+    push(vc);
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

@@ -1,0 +1,35 @@
+//
+//  DGouWuCheOperation.m
+//  dajike
+//
+//  Created by swb on 15/7/23.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DGouWuCheOperation.h"
+#import "FMDatabase.h"
+#import "dDefine.h"
+
+@implementation DGouWuCheOperation
+
++ (void)addIntoGouWuChe:(DGoodsDetailModel *)model
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [paths objectAtIndex:0];
+    NSString *dbPath = [documentDirectory stringByAppendingPathComponent:@"GouWuChe.db"];
+    FMDatabase *db = [FMDatabase databaseWithPath:dbPath] ;
+    if (![db open]) {
+        NSLog(@"Could not open db.");
+        return ;
+    }
+    [db executeUpdate:@"CREATE TABLE IF NOT EXISTS AddGouWuChe (goodsId integer, goodsPrice integer, num integer, goodsDefaultImage text, goodsName text, spec1 text, spec2 text, specId integer, specName1 text, specName2 text, storeId integer, storeLogo text, storeName text)"];
+    
+    NSString *sql = [NSString stringWithFormat:@"INSERT INTO AddGouWuChe (goodsId, goodsPrice, num, goodsDefaultImage, goodsName, spec1, spec2, specId, specName1, specName2, storeId, storeLogo, storeName) VALUES ('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@')",model.goodsId,model.goodsPrice,model.num,model.goodsDefaultImage,model.goodsName,model.spec1,model.spec2,model.specId,model.specName1,model.specName2,model.storeId,model.storeLogo,model.storeName];
+    [db executeUpdate:sql];
+    
+    showMessage(@"加入购物车成功");
+    
+    [db close];
+}
+
+@end

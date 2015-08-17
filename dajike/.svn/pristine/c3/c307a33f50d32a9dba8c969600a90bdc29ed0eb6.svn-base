@@ -1,0 +1,20 @@
+//
+//  DCollectGoodCell.h
+//  dajike
+//
+//  Created by songjw on 15/7/16.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface DCollectGoodCell : UITableViewCell
+@property (weak, nonatomic) IBOutlet UIImageView *headImgV;
+@property (weak, nonatomic) IBOutlet UILabel *nameLab;
+@property (weak, nonatomic) IBOutlet UILabel *priceLab;
+@property (weak, nonatomic) IBOutlet UILabel *price_Lab;
+@property (weak, nonatomic) IBOutlet UILabel *precentLab;
+@property (weak, nonatomic) IBOutlet UILabel *feeLab;
+@property (weak, nonatomic) IBOutlet UILabel *evaluatersLab;
+
+@end

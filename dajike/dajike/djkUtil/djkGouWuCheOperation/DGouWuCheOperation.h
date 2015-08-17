@@ -1,0 +1,29 @@
+//
+//  DGouWuCheOperation.h
+//  dajike
+//
+//  Created by swb on 15/7/23.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "DGoodsDetailModel.h"
+@class FMDatabase;
+@interface DGouWuCheOperation : NSObject
+//获取数据库
++ (FMDatabase *)getDatabase;
+//添加到本地购物车
++ (void)addIntoGouWuChe:(DGoodsDetailModel *)model;
+//得到数据库中所有不同的storeid
++ (NSMutableArray *)getDistinctStoreIdArr;
+//遍历购物车
++ (NSMutableDictionary *)traverseGouWuChe;
+//与后台同步
++ (NSMutableDictionary *)syncGouWuChe;
+//同步后更改状态
++ (void)updateStatus;
+//删除购物车里面的商品
++ (void)deleteGouWuCheProducts:(NSMutableArray *)deleteArr;
+//获取本地购物车数量
++ (int)getGouWuCheNum;
+@end

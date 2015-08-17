@@ -1,0 +1,68 @@
+//
+//  DGouWuCheOperation.m
+//  dajike
+//
+//  Created by swb on 15/7/23.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DGouWuCheOperation.h"
+#import "FMDatabase.h"
+#import "dDefine.h"
+
+@implementation DGouWuCheOperation
+//获取数据库
++ (NSString *)getDatabasePath
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [paths objectAtIndex:0];
+    NSString *dbPath = [documentDirectory stringByAppendingPathComponent:@"GouWuChe.db"];
+    return dbPath;
+}
+//添加到本地购物车
++ (void)addIntoGouWuChe:(DGoodsDetailModel *)model
+{
+    FMDatabase *db = [FMDatabase databaseWithPath:[self getDatabasePath]] ;
+    if (![db open]) {
+        NSLog(@"Could not open db.");
+        return ;
+    }
+    [db executeUpdate:@"CREATE TABLE IF NOT EXISTS AddGouWuChe (goodsId integer, goodsPrice integer, num integer, goodsDefaultImage text, goodsName text, spec1 text, spec2 text, specId integer, specName1 text, specName2 text, storeId integer, storeLogo text, storeName text)"];
+    
+    NSString *sql = [NSString stringWithFormat:@"INSERT INTO AddGouWuChe (goodsId, goodsPrice, num, goodsDefaultImage, goodsName, spec1, spec2, specId, specName1, specName2, storeId, storeLogo, storeName) VALUES ('%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@')",model.goodsId,model.goodsPrice,model.num,model.goodsDefaultImage,model.goodsName,model.spec1,model.spec2,model.specId,model.specName1,model.specName2,model.storeId,model.storeLogo,model.storeName];
+    [db executeUpdate:sql];
+    
+    showMessage(@"加入购物车成功");
+    
+    [db close];
+}
+//遍历购物车
++ (void)traverseGouWuChe
+{
+    FMDatabase *db = [FMDatabase databaseWithPath:[self getDatabasePath]] ;
+    if (![db open]) {
+        NSLog(@"Could not open db.");
+        return ;
+    }
+    [db executeUpdate:@"CREATE TABLE IF NOT EXISTS AddGouWuChe (goodsId integer, goodsPrice integer, num integer, goodsDefaultImage text, goodsName text, spec1 text, spec2 text, specId integer, specName1 text, specName2 text, storeId integer, storeLogo text, storeName text)"];
+    NSMutableArray *storeIdKeyArr = [[NSMutableArray alloc]init];
+    FMResultSet *s = [db executeQuery:@"SELECT DISTINCT storeId FROM AddGouWuChe GROUP BY storeId"];
+    while ([s next]) {
+        [storeIdKeyArr addObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"storeId"]]];
+    }
+    NSLog(@"%@",storeIdKeyArr);
+    NSMutableArray *goodsArr = [[NSMutableArray alloc]init];
+    for (int i=0; i<storeIdKeyArr.count; i++) {
+        NSString *storeId = [storeIdKeyArr objectAtIndex:i];
+        FMResultSet *s = [db executeQuery:storeId];
+        while ([s next]) {
+            NSMutableDictionary *goodsDic = [[NSMutableDictionary alloc]init];
+            [goodsDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"storeId"]] forKey:@"storeId"];
+//            goodsArr addObject:
+        }
+    }
+    [db close];
+}
+
+
+@end

@@ -1,0 +1,35 @@
+//
+//  DProductOrderCell.m
+//  dajike
+//
+//  Created by swb on 15/7/14.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DProductOrderCell.h"
+#import "dDefine.h"
+
+@implementation DProductOrderCell
+
+- (void)awakeFromNib {
+    // Initialization code
+    self.goodImg.layer.cornerRadius = 6.0f;
+    self.goodImg.layer.masksToBounds = YES;
+}
+
+- (void)setOrderGoodModel:(orderGoodsModel *)orderGoodModel
+{
+    [self.goodImg setImageWithURL:[commonTools getImgURL:orderGoodModel.goods_image] placeholderImage:DPlaceholderImage];
+    self.goodName.text = orderGoodModel.goods_name;
+    self.goodSepcLb.text = [NSString stringWithFormat:@"%@",orderGoodModel.specification];
+    self.goodsNumLb.text = [NSString stringWithFormat:@"x%d",[orderGoodModel.quantity intValue]];
+    self.goodPriceLb.text = [NSString stringWithFormat:@"¥%.2f",[orderGoodModel.price floatValue]];
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

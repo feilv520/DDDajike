@@ -1,0 +1,23 @@
+//
+//  DBuySeccess1Cell.h
+//  dajike
+//
+//  Created by swb on 15/7/22.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "OrdersDetailModel.h"
+
+@interface DBuySeccess1Cell : UITableViewCell
+
+@property (strong, nonatomic) OrdersDetailModel *model;
+//@property (weak, nonatomic) IBOutlet UILabel *orderSnLb;
+@property (weak, nonatomic) IBOutlet UIView *orderSnView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *orderSnViewCon;
+@property (weak, nonatomic) IBOutlet UILabel *moneyLb;
+
+@property (strong, nonatomic) NSString *allMoney;
+@property (strong, nonatomic) NSMutableArray *orderSnArr;
+
+@end

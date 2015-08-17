@@ -1,0 +1,36 @@
+//
+//  DZiyingCell.m
+//  dajike
+//
+//  Created by dajike on 15/7/17.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DZiyingCell.h"
+#import "dDefine.h"
+
+@implementation DZiyingCell
+
+- (void)awakeFromNib {
+    // Initialization code
+    [self.label1 setFont:DFont_14];
+    [self.label1 setTextColor:DColor_666666];
+    
+    [self.label2 setFont:DFont_11];
+    [self.label2 setTextColor:DColor_999999];
+    
+    [self.label3 setFont:DFont_11];
+    [self.label3 setTextColor:DColor_999999];
+    
+    [self.label4 setFont:DFont_11];
+    [self.label4 setTextColor:DColor_999999];
+    
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

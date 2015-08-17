@@ -1,0 +1,149 @@
+//
+//  DGouWuCheOperation.m
+//  dajike
+//
+//  Created by swb on 15/7/23.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DGouWuCheOperation.h"
+#import "FMDatabase.h"
+#import "dDefine.h"
+
+@implementation DGouWuCheOperation
+//获取数据库
++ (FMDatabase *)getDatabase
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [paths objectAtIndex:0];
+    NSString *dbPath = [documentDirectory stringByAppendingPathComponent:@"GouWuChe.db"];
+    FMDatabase *db = [FMDatabase databaseWithPath:dbPath] ;
+    if (![db open]) {
+        NSLog(@"Could not open db.");
+        return nil;
+    }
+    [db executeUpdate:@"CREATE TABLE IF NOT EXISTS AddGouWuChe (status integer, goodsId text, goodsPrice integer, number integer, goodsDefaultImage text, goodsName text, spec1 text, spec2 text, specId integer, specName1 text, specName2 text, storeId integer, storeLogo text, storeName text,stock integer, lastTime text)"];
+    return db;
+}
+//添加到本地购物车
++ (void)addIntoGouWuChe:(DGoodsDetailModel *)model
+{
+    FMDatabase *db = [self getDatabase];
+    UInt64 recordTime = [[NSDate date] timeIntervalSince1970]*1000;
+    NSString *time_stamp = [NSString stringWithFormat:@"%llu",recordTime];
+    
+    
+    //如果数据库已有该商品，合并更新数量
+    NSString *sqlUpdate = [NSString stringWithFormat:@"UPDATE AddGouWuChe SET number = number+%d,status='0' WHERE specId ='%d' AND storeId ='%d'",[model.number intValue],[model.specId intValue],[model.storeId intValue]];
+    //如果数据库没有该商品，执行插入
+    NSString *sqlInsert = [NSString stringWithFormat:@"INSERT INTO AddGouWuChe (status, goodsId, goodsPrice, number, goodsDefaultImage, goodsName, spec1, spec2, specId, specName1, specName2, storeId, storeLogo, storeName, stock, lastTime) VALUES ('%d','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@','%@')",0,model.goodsId,model.goodsPrice,model.number,model.goodsDefaultImage,model.goodsName,model.spec1,model.spec2,model.specId,model.specName1,model.specName2,model.storeId,model.storeLogo,model.storeName,model.stock,time_stamp];
+    
+    FMResultSet *s = [db executeQuery:[NSString stringWithFormat:@"SELECT goodsId FROM AddGouWuChe WHERE specId ='%d' AND storeId ='%d'",[model.specId intValue],[model.storeId intValue]]];
+    if ([s next]) {
+        
+    }
+    if ([commonTools isNull:[s stringForColumn:@"goodsId"]]) {
+        [db executeUpdate:sqlInsert];
+    }else
+        [db executeUpdate:sqlUpdate];
+    
+    showMessage(@"加入购物车成功");
+    
+    [db close];
+}
+//得到数据库中所有不同的storeid
++ (NSMutableArray *)getDistinctStoreIdArr
+{
+    FMDatabase *db = [self getDatabase];
+    NSMutableArray *storeIdKeyArr = [[NSMutableArray alloc]init];
+    FMResultSet *s = [db executeQuery:@"SELECT DISTINCT storeId FROM AddGouWuChe GROUP BY storeId"];
+    while ([s next]) {
+        [storeIdKeyArr addObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"storeId"]]];
+    }
+    NSLog(@"%@",storeIdKeyArr);
+    return storeIdKeyArr;
+}
+//遍历购物车
++ (NSMutableDictionary *)traverseGouWuChe
+{
+    FMDatabase *db = [self getDatabase];
+    NSMutableArray *storeIdKeyArr = [[self getDistinctStoreIdArr]mutableCopy];
+    NSMutableDictionary *resultDic = [[NSMutableDictionary alloc]init];
+    for (int i=0; i<storeIdKeyArr.count; i++) {
+        NSMutableArray *goodsArr = [[NSMutableArray alloc]init];
+        NSString *storeId = [storeIdKeyArr objectAtIndex:i];
+        FMResultSet *s = [db executeQuery:[NSString stringWithFormat:@"SELECT * FROM AddGouWuChe WHERE storeId='%@'",storeId]];
+        while ([s next]) {
+            NSMutableDictionary *goodsDic = [[NSMutableDictionary alloc]init];
+            
+            [goodsDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"storeId"]] forKey:@"storeId"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"specId"]] forKey:@"specId"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"goodsPrice"]] forKey:@"goodsPrice"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"goodsId"]] forKey:@"goodsId"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"number"]] forKey:@"number"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"stock"]] forKey:@"stock"];
+            
+            [goodsDic setObject:[s stringForColumn:@"lastTime"] forKey:@"lastTime"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"goodsDefaultImage"]] forKey:@"goodsDefaultImage"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"goodsName"]] forKey:@"goodsName"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"spec1"]] forKey:@"spec1"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"spec2"]] forKey:@"spec2"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"specName1"]] forKey:@"specName1"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"specName2"]] forKey:@"specName2"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"storeLogo"]] forKey:@"storeLogo"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"storeName"]] forKey:@"storeName"];
+            [goodsArr addObject:goodsDic];
+        }
+        [resultDic setObject:goodsArr forKey:storeId];
+    }
+    NSLog(@"%@",resultDic);
+    [db close];
+    return resultDic;
+}
+//与后台同步
++ (NSMutableDictionary *)syncGouWuChe
+{
+    FMDatabase *db = [self getDatabase];
+    NSMutableArray *storeIdKeyArr = [[self getDistinctStoreIdArr]mutableCopy];
+    NSMutableDictionary *resultDic = [[NSMutableDictionary alloc]init];
+    for (int i=0; i<storeIdKeyArr.count; i++) {
+        NSMutableArray *goodsArr = [[NSMutableArray alloc]init];
+        NSString *storeId = [storeIdKeyArr objectAtIndex:i];
+        FMResultSet *s = [db executeQuery:[NSString stringWithFormat:@"SELECT * FROM AddGouWuChe WHERE storeId='%@' and status='0'",storeId]];
+        while ([s next]) {
+            NSMutableDictionary *goodsDic = [[NSMutableDictionary alloc]init];
+            UInt64 recordTime = [[NSDate date] timeIntervalSince1970]*1000;
+            NSString *time_stamp = [NSString stringWithFormat:@"%llu",recordTime];
+//            [goodsDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"storeId"]] forKey:@"storeId"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"specId"]] forKey:@"specId"];
+            [goodsDic setObject:time_stamp forKey:@"lastTime"];
+            [goodsDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"number"]] forKey:@"number"];
+            [goodsArr addObject:goodsDic];
+        }
+        if (goodsArr.count>0) {
+            [resultDic setObject:goodsArr forKey:storeId];
+        }
+    }
+    NSLog(@"%@",resultDic);
+    [db close];
+    return resultDic;
+}
+//同步后更改状态
++ (void)updateStatus
+{
+    FMDatabase *db = [self getDatabase];
+    NSMutableArray *storeIdKeyArr = [[self getDistinctStoreIdArr]mutableCopy];
+    for (int i=0; i<storeIdKeyArr.count; i++) {
+        [db executeUpdate:[NSString stringWithFormat:@"UPDATE AddGouWuChe SET status='1' WHERE storeId ='%d'",[[storeIdKeyArr objectAtIndex:i]intValue]]];
+    }
+}
+//删除购物车里面的商品
++ (void)deleteGouWuCheProducts:(NSMutableArray *)deleteArr
+{
+    FMDatabase *db = [self getDatabase];
+    for (int i=0; i<deleteArr.count; i++) {
+        [db executeUpdate:[NSString stringWithFormat:@"DELETE FROM AddGouWuChe WHERE storeId='%d' and specId='%d'",[[[deleteArr objectAtIndex:i]objectForKey:@"storeId"]intValue],[[[deleteArr objectAtIndex:i]objectForKey:@"specId"]intValue]]];
+    }
+}
+
+@end

@@ -1,0 +1,237 @@
+//
+//  DSettingViewController.m
+//  dajike
+//
+//  Created by songjw on 15/7/10.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DSettingViewController.h"
+#import "SettintOneCell.h"
+#import "MineNextCell.h"
+#import "FileOperation.h"
+#import "dDefine.h"
+#import "DTools.h"
+#import "defines.h"
+#import "DGouWuCheOperation.h"
+
+#import "DWebViewController.h"
+//测试
+static NSString *appID = @"996401785";
+
+@interface DSettingViewController ()<UIAlertViewDelegate>{
+    NSArray *_dataArray;
+}
+
+@end
+
+@implementation DSettingViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [self.view setBackgroundColor:DColor_f3f3f3];
+    [self setNaviBarTitle:@"设置"];
+    [self addTableView:NO];
+    self.dMainTableView.delegate = self;
+    self.dMainTableView.dataSource = self;
+    self.dMainTableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    
+    [self addData];
+}
+- (void)addData
+{
+    _dataArray = @[
+                  //                  @{
+                  //                      @"title" : @"展示高清图片",
+                  //                      },
+                  @{
+                      @"title" : @"系统消息",
+                      },
+                  @{
+                      @"title" : @"我的消息",
+                      },
+                  @{
+                      @"title" : @"清除缓存",
+                      },
+                  @{
+                      @"title" : @"联系客服",
+                      },
+                  @{
+                      @"title" : @"去评价",
+                      },
+                  @{
+                      @"title" : @"帮助中心",
+                      },
+                  @{
+                      @"title" : @"关于我们",
+                      },
+                  ];
+    
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 80;
+}
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+{
+    UIView *footV = [self.view createViewWithFrame:CGRectMake(0, 0, DWIDTH_CONTROLLER_DEFAULT, 80) andBackgroundColor:[UIColor clearColor]];
+    if ([FileOperation isLogin]) {
+        UIButton *quitBtn = [self.view createButtonWithFrame:CGRectMake(40, 20, DWIDTH_CONTROLLER_DEFAULT-80, 40) andBackImageName:nil andTarget:self andAction:@selector(quitBtnAction:) andTitle:@"退出登录" andTag:22];
+        [DTools setButtton:quitBtn Font:DFont_13 titleColor:DColor_ffffff backColor:DColor_c4291f];
+        quitBtn.layer.cornerRadius = 5.0f;
+        quitBtn.layer.masksToBounds = YES;
+        [footV addSubview:quitBtn];
+    }
+    
+    return footV;
+}
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return _dataArray.count;
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    //    UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
+    //    return cell.frame.size.height;
+    return 44;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSInteger row = indexPath.row;
+    if (row <= 1) {
+        SettintOneCell *cell0 = [DTools loadTableViewCell:self.dMainTableView cellClass:[SettintOneCell class]];
+        [cell0.label1 setHidden:YES];
+        [cell0.switch1 setHidden:NO];
+        cell0.switch1.on = NO;
+        cell0.switch1.tintColor = [UIColor grayColor];
+        cell0.switch1.onTintColor = DColor_mainRed;
+        [DTools setLable:cell0.titlelabel Font:DFont_13 titleColor:DColor_808080 backColor:[UIColor clearColor]];
+        cell0.titlelabel.text = [[_dataArray objectAtIndex:row]objectForKey:@"title"];
+        return cell0;
+    }else if(row == 2){
+        SettintOneCell *cell1 = [DTools loadTableViewCell:self.dMainTableView cellClass:[SettintOneCell class]];;
+        [cell1.label1 setHidden:NO];
+        [cell1.switch1 setHidden:YES];
+        cell1.switch1.tintColor = [UIColor darkGrayColor];
+        cell1.titlelabel.text = [[_dataArray objectAtIndex:row]objectForKey:@"title"];
+        [DTools setLable:cell1.titlelabel Font:DFont_13 titleColor:DColor_808080 backColor:[UIColor clearColor]];
+        [DTools setLable:cell1.label1 Font:DFont_13 titleColor:DColor_808080 backColor:[UIColor clearColor]];
+
+        NSString *cachPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+        cell1.label1.text = [NSString stringWithFormat:@"%.1fM",[FileOperation folderSizeAtPath:cachPath]];
+        return cell1;
+    }else if(row > 2){
+        MineNextCell *cell2 = [DTools loadTableViewCell:self.dMainTableView cellClass:[MineNextCell class]];
+        [DTools setLable:cell2.titleLabel Font:DFont_13 titleColor:DColor_808080 backColor:[UIColor clearColor]];
+        cell2.titleLabel.text = [[_dataArray objectAtIndex:row]objectForKey:@"title"];
+        [cell2.titleTwoLabel setHidden:YES];
+        return cell2;
+    }
+    return nil;
+}
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    //取消点击选中状态
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    if (indexPath.row == 0) {//系统消息
+       
+    }else if (indexPath.row == 1){//我的消息
+        
+    }else if (indexPath.row == 2){//消除缓存
+        UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:@"提示" message:@"确定要清除缓存数据吗？" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+        [alertView show];
+        
+    }else if (indexPath.row == 3){//联系客服
+        [commonTools dialPhone:@"4007281117"];
+        
+    }else if (indexPath.row == 4){//去评价
+        NSString *str = [NSString stringWithFormat: @"itms-apps://ax.itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%@", appID];
+        
+        if([[[UIDevice currentDevice] systemVersion]floatValue] >= 7){
+            
+            str = [NSString stringWithFormat:@"itms-apps://itunes.apple.com/app/id%@",appID];
+            
+        }
+        
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:str]];
+    }else if (indexPath.row == 5){//帮助中心
+        DWebViewController *vc = [[DWebViewController alloc]init];
+        vc.isHelp = 1;
+        [self.navigationController pushViewController:vc animated:YES];
+    }else if (indexPath.row == 6){//关于我们
+        DWebViewController *vc = [[DWebViewController alloc]init];
+        vc.isHelp = 2;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
+    
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0) {
+        return;
+    }else {
+        NSString *cachPath = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+//        [FileOperation clearCacheAtPath:cachPath];
+//        [self.dMainTableView reloadData];
+        
+        dispatch_async(
+                       dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+                       , ^{
+                           
+                           
+                           [FileOperation clearCacheAtPath:cachPath];
+
+                           
+                           dispatch_async(dispatch_get_main_queue(), ^{
+                               [self.dMainTableView reloadData];
+                           });
+                       });
+    }
+
+    
+}
+
+- (void)quitBtnAction:(UIButton *)btn{
+    NSDictionary *parameter = @{@"userId":[FileOperation getUserId]};
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyAccounts.logout" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            NSLog(@"result = %@",responseObject.result);
+            [FileOperation logOffOrlogOut];
+            //获取购物车数量
+            int gouwucheNum = [DGouWuCheOperation getGouWuCheNum];
+            [FileOperation setPlistObject:[NSString stringWithFormat:@"%d",gouwucheNum] forKey:@"cartCount" ofFilePath:[FileOperation creatPlistIfNotExist:jibaobaoUser]];
+            [[NSNotificationCenter defaultCenter]postNotificationName:@"changeGouWuCheNum" object:nil];
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }else
+            [ProgressHUD showMessage:responseObject.msg Width:100 High:80];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+    }];
+}
+
+
+
+
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

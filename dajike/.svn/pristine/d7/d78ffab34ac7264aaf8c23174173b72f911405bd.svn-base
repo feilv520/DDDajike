@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7702" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="RecommendFoodCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="80"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="H1P-iG-04M">
+                        <rect key="frame" x="8" y="10" width="60" height="60"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="60" id="KMW-hW-Kt7"/>
+                            <constraint firstAttribute="width" constant="60" id="qef-nh-tIB"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="糖醋排骨" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="As8-zA-job">
+                        <rect key="frame" x="76" y="8" width="236" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="32" id="L2t-bu-ZCh"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="101人推荐" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pyX-Gp-gpb">
+                        <rect key="frame" x="106" y="48" width="118" height="26"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="26" id="9wl-BB-Gbb"/>
+                            <constraint firstAttribute="width" constant="118" id="FOO-Xe-ZC1"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b6T-tN-AFJ">
+                        <rect key="frame" x="76" y="42" width="32" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="32" id="CUq-0Y-sgz"/>
+                            <constraint firstAttribute="width" constant="32" id="kDM-ZE-Zeo"/>
+                        </constraints>
+                        <state key="normal" image="img_asterisk_02.png">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                    </button>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="¥100" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DgT-pk-hIE">
+                        <rect key="frame" x="232" y="48" width="80" height="26"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="26" id="1Ra-Dc-vnf"/>
+                            <constraint firstAttribute="width" constant="80" id="PJi-yZ-gQx"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.79607843140000001" green="0.078431372550000003" blue="0.28235294119999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="H1P-iG-04M" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="Flk-MF-GoV"/>
+                    <constraint firstItem="As8-zA-job" firstAttribute="leading" secondItem="H1P-iG-04M" secondAttribute="trailing" constant="8" id="Fom-lg-2ji"/>
+                    <constraint firstItem="b6T-tN-AFJ" firstAttribute="leading" secondItem="H1P-iG-04M" secondAttribute="trailing" constant="8" id="LVR-2U-MzT"/>
+                    <constraint firstItem="H1P-iG-04M" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="SDQ-Yr-MTj"/>
+                    <constraint firstAttribute="trailing" secondItem="DgT-pk-hIE" secondAttribute="trailing" constant="8" id="WvD-GL-bfG"/>
+                    <constraint firstItem="b6T-tN-AFJ" firstAttribute="top" secondItem="As8-zA-job" secondAttribute="bottom" constant="2" id="agu-hq-cFv"/>
+                    <constraint firstItem="pyX-Gp-gpb" firstAttribute="top" secondItem="As8-zA-job" secondAttribute="bottom" constant="8" id="c1N-Y4-CB4"/>
+                    <constraint firstItem="As8-zA-job" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="hEC-jO-6W0"/>
+                    <constraint firstAttribute="trailing" secondItem="As8-zA-job" secondAttribute="trailing" constant="8" id="ngx-P5-6Y2"/>
+                    <constraint firstItem="DgT-pk-hIE" firstAttribute="leading" secondItem="pyX-Gp-gpb" secondAttribute="trailing" constant="8" id="oYi-OV-IJE"/>
+                    <constraint firstItem="DgT-pk-hIE" firstAttribute="top" secondItem="As8-zA-job" secondAttribute="bottom" constant="8" id="y9K-xU-4gF"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="PriceLab" destination="DgT-pk-hIE" id="MWt-zU-IYm"/>
+                <outlet property="goodNumLab" destination="pyX-Gp-gpb" id="Lcy-eB-bOB"/>
+                <outlet property="headImgV" destination="H1P-iG-04M" id="Qmt-kd-VGf"/>
+                <outlet property="nameLab" destination="As8-zA-job" id="oVc-3J-Psv"/>
+                <outlet property="storBtn" destination="b6T-tN-AFJ" id="mlc-8k-Egd"/>
+            </connections>
+            <point key="canvasLocation" x="492" y="416"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="img_asterisk_02.png" width="50" height="50"/>
+    </resources>
+</document>

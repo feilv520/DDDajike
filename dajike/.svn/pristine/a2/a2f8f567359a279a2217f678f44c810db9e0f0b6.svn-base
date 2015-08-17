@@ -1,0 +1,144 @@
+//
+//  DMyFriendDetailViewController.m
+//  dajike
+//
+//  Created by songjw on 15/7/15.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DMyFriendDetailViewController.h"
+#import "dDefine.h"
+
+@interface DMyFriendDetailViewController (){
+    UILabel *_nameLab;
+    UILabel *_contentLab;
+}
+
+@end
+
+@implementation DMyFriendDetailViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [self setNaviBarTitle:@"好友详情"];
+    [self addTableView:NO];
+    [self.view setBackgroundColor:DBackColor_mine];
+    [self.dMainTableView setBackgroundColor:DBackColor_mine];
+    self.dMainTableView.delegate = self;
+    self.dMainTableView.dataSource = self;
+    self.dMainTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.dMainTableView.scrollEnabled = NO;
+}
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    return 6;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    return 0.5;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 45.0;
+}
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"myFriendsDetailCell"];
+    if (!cell) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"myFriendsDetailCell"];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.backgroundColor = DBackColor_mine;
+        _nameLab = [[UILabel alloc]initWithFrame:CGRectMake(DWIDTH_CONTROLLER_DEFAULT/4 -60, 0, 120, 45.0)];
+        _contentLab = [[UILabel alloc]initWithFrame:CGRectMake(DWIDTH_CONTROLLER_DEFAULT*3/4-60, 0, 120, 45.0)];
+        
+        _nameLab.textAlignment = NSTextAlignmentLeft;
+        _nameLab.textColor = DColor_word_bg;
+        _contentLab.textAlignment = NSTextAlignmentLeft;
+        _contentLab.textColor = DColor_word_bg;
+        _nameLab.font = [UIFont systemFontOfSize:16.0];
+        _contentLab.font = [UIFont systemFontOfSize:16.0];
+        
+        [cell addSubview:_nameLab];
+        [cell addSubview:_contentLab];
+        switch (indexPath.row) {
+            case 0:
+                _nameLab.text = @"用户名:";
+                if ([self.myFriendsModel.user_name isEqualToString:@"<null>"]) {
+                    _contentLab.text = @"无";
+                }else{
+                    _contentLab.text = self.myFriendsModel.user_name;
+                }
+                
+                break;
+            case 1:
+                _nameLab.text = @"集客小店号:";
+                if ([self.myFriendsModel.user_id isEqualToString:@"<null>"]) {
+                    _contentLab.text = @"无";
+                }else{
+                    _contentLab.text = self.myFriendsModel.user_id;
+                }
+                break;
+            case 2:
+                _nameLab.text = @"集客小店昵称:";
+                if ([self.myFriendsModel.shop_name isEqualToString:@"<null>"]) {
+                    _contentLab.text = @"无";
+                }else{
+                    _contentLab.text = self.myFriendsModel.shop_name;
+                }
+                break;
+            case 3:
+                _nameLab.text = @"邮箱:";
+                if ([self.myFriendsModel.email isEqualToString:@"<null>"]) {
+                    _contentLab.text = @"无";
+                }else{
+                    _contentLab.text = self.myFriendsModel.email;
+                }
+                break;
+            case 4:
+                _nameLab.text = @"登陆次数:";
+                if ([self.myFriendsModel.logins isEqualToString:@"<null>"]) {
+                    _contentLab.text = @"无";
+                }else{
+                    _contentLab.text = self.myFriendsModel.logins;
+                }
+                break;
+            case 5:
+                _nameLab.text = @"最后登录时间:";
+                if ([self.myFriendsModel.last_login isEqualToString:@"<null>"]) {
+                    _contentLab.text = @"无";
+                }else{
+                    
+                    _contentLab.text = [commonTools timesToDate:self.myFriendsModel.last_login];
+                }
+                break;
+            case 6:
+                _nameLab.text = @"注册时间:";
+                if ([self.myFriendsModel.reg_time isEqualToString:@"<null>"]) {
+                    _contentLab.text = @"无";
+                }else{
+                    _contentLab.text = [commonTools timesToDate:self.myFriendsModel.reg_time];
+                }
+                break;
+                
+            default:
+                break;
+        }
+        
+    }
+    
+    return cell;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

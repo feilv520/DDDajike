@@ -1,0 +1,17 @@
+//
+//  DTools.h
+//  dajike
+//
+//  Created by dajike on 15/7/10.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+
+@interface DTools : NSObject
+//获取nib cell 重用
++ (id) loadTableViewCell:(UITableView *)tableView cellClass:(Class)objClass;
+//获取nib cell 非重用
++ (id) loadTableViewWithoutChongyongCell:(UITableView *)tableView cellClass:(Class)objClass;
+@end

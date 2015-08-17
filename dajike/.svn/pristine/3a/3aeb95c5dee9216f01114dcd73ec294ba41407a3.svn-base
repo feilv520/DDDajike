@@ -1,0 +1,150 @@
+//
+//  DLoginViewController.m
+//  dajike
+//
+//  Created by songjw on 15/7/10.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DLoginViewController.h"
+#import "DBaseNavView.h"
+#import "DVerifyPhoneNumViewController.h"
+#import "DFindPassword0ViewController.h"
+#import "dDefine.h"
+#import "DES3Util.h"
+#import "DMyAfHTTPClient.h"
+#import "MBProgressHUD+Add.h"
+#import "FileOperation.h"
+#import "AnalysisData.h"
+
+@interface DLoginViewController (){
+    DImgButton *_leftBut;
+    DImgButton *_rightBut;
+    
+}
+
+@end
+
+@implementation DLoginViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    [self setNaviBarTitle:@"登录"];
+    [self.view setBackgroundColor:DBackColor_mine];
+    _leftBut = [DBaseNavView  createNavBtnWithTitle:@"取消" target:self action:@selector(leftButAction)];
+    [self setNaviBarLeftBtn:_leftBut];
+    _rightBut = [DBaseNavView createNavBtnWithTitle:@"注册" target:self action:@selector(rightButAction)];
+    [self setNaviBarRightBtn:_rightBut];
+    
+}
+- (void)leftButAction{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+- (void)rightButAction{
+    DVerifyPhoneNumViewController *registerVerifyVC = [[DVerifyPhoneNumViewController alloc]initWithNibName:@"DVerifyPhoneNumViewController" bundle:nil];
+    registerVerifyVC.verigyTape = register_verify;
+    [self.navigationController pushViewController:registerVerifyVC animated:YES];
+}
+
+- (IBAction)buttonAction:(id)sender {
+    UIButton *but = (UIButton *)sender;
+    if (but.tag == 0) {
+        [self login];
+    }else if (but.tag == 1) {
+        DFindPassword0ViewController *findVC = [[DFindPassword0ViewController alloc]initWithNibName:@"DFindPassword0ViewController" bundle:nil];
+        [self.navigationController pushViewController:findVC animated:YES];
+    }else if (but.tag == 2){//快速登录
+        DVerifyPhoneNumViewController *registerVerifyVC = [[DVerifyPhoneNumViewController alloc]initWithNibName:@"DVerifyPhoneNumViewController" bundle:nil];
+        registerVerifyVC.verigyTape = quick_login;
+        [self.navigationController pushViewController:registerVerifyVC animated:YES];
+    }
+    
+}
+//登录
+- (void)login{
+    NSLog(@"-%@-\n-%@-",self.userTextfield.text,self.passwordTextfield.text);
+    NSString *username = [DES3Util encrypt:self.userTextfield.text];
+    NSString *password = [DES3Util encrypt:self.passwordTextfield.text];
+    NSDictionary *parameter = [NSDictionary dictionaryWithObjectsAndKeys:password,@"password",username,@"username", nil];
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyAccounts.login" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        NSLog(@"operation = %@",operation);
+        NSLog(@"result:%@",responseObject.result);
+        if (responseObject.succeed) {
+            //保存userid 和password
+            [FileOperation saveUserId:responseObject.result];
+            [FileOperation savePassword:[DES3Util encrypt:self.passwordTextfield.text]];
+            
+            //设置
+            NSString *filePath = [FileOperation creatPlistIfNotExist:SET_PLIST];
+            [FileOperation setPlistObject:@"1" forKey:kIsLogin ofFilePath:filePath];
+        }else{
+            [MBProgressHUD show:@"账号或密码错误，请重新输入" icon:nil view:self.view afterDelay:0.7];
+        }
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            
+            //获取用户会员信息
+            [self getUerInfo];
+            
+        });
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+}
+
+- (void)getUerInfo{
+    NSLog(@"%@",[FileOperation getUserId]);
+    NSDictionary *parameter = @{@"userId":[NSString stringWithString:[FileOperation getUserId]]};
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyUserInfos.index" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        NSLog(@"operation = %@",operation);
+        NSLog(@"result:%@",responseObject.result);
+        if (responseObject.succeed) {
+            
+            NSString *jsonStr = [AnalysisData decodeToString:responseObject.result];
+            NSMutableDictionary *userInfoDic = [[JsonStringTransfer jsonStringToDictionary:jsonStr]mutableCopy];
+            NSString *filePath = [FileOperation creatPlistIfNotExist:dajikeUser];
+            [FileOperation writeToPlistFile:filePath withDic:userInfoDic];
+            [self.navigationController popViewControllerAnimated:NO];
+        }else{
+            
+        }
+        
+       
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+
+@end

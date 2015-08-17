@@ -1,0 +1,37 @@
+//
+//  mineMainCell3.m
+//  jibaobao
+//
+//  Created by dajike on 15/5/11.
+//  Copyright (c) 2015年 dajike. All rights reserved.
+//
+
+#import "mineMainCell3.h"
+#import "commonTools.h"
+#import "FileOperation.h"
+
+@implementation mineMainCell3
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+//@property (weak, nonatomic) IBOutlet UILabel *moneylabel1;
+//@property (weak, nonatomic) IBOutlet UILabel *moneylabel2;
+//@property (weak, nonatomic) IBOutlet UILabel *moneylabel3;
+//@property (weak, nonatomic) IBOutlet UILabel *moneylabel4;
+
+- (void) setAccountOverViewModel:(AccountOverViewModel *)model
+{
+    self.moneylabel1.text = [commonTools moneyTolayout:model.chongzhi_jine_index];
+    self.moneylabel2.text = [commonTools moneyTolayout:model.shouyi_yue];
+    self.moneylabel3.text = model.jifen;
+//    self.moneylabel4.text = [commonTools moneyTolayout:model.jifen];
+}
+
+@end

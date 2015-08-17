@@ -1,0 +1,33 @@
+//
+//  DConfirmOrder1Cell.m
+//  dajike
+//
+//  Created by swb on 15/7/22.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DConfirmOrder1Cell.h"
+#import "dDefine.h"
+
+@implementation DConfirmOrder1Cell
+
+- (void)awakeFromNib {
+    // Initialization code
+    self.lineView1Con.constant = 0.5f;
+    self.lineView2Con.constant = 0.5f;
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+- (IBAction)btnClicked:(id)sender {
+    self.blcok();
+}
+- (void)callBack:(CallbackCellClicked)block
+{
+    self.blcok = block;
+}
+@end

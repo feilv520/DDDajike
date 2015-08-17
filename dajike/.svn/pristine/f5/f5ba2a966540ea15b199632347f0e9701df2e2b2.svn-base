@@ -1,0 +1,115 @@
+//
+//  DTransferViewController.m
+//  dajike
+//
+//  Created by songjw on 15/7/20.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DTransferViewController.h"
+#import "dDefine.h"
+#import "DES3Util.h"
+#import "DTools.h"
+#import "DMyAfHTTPClient.h"
+#import "DVerifyPhoneNumViewController.h"
+
+@interface DTransferViewController ()
+
+@end
+
+@implementation DTransferViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    [self.view setBackgroundColor:DColor_f3f3f3];
+    [DTools setLable:self.lab_1 Font:DFont_12 titleColor:DColor_808080 backColor:DColor_f3f3f3];
+    [DTools setLable:self.lab_2 Font:DFont_11 titleColor:DColor_b2b2b2 backColor:DColor_f3f3f3];
+    [DTools setLable:self.lab_3 Font:DFont_11 titleColor:DColor_b2b2b2 backColor:DColor_f3f3f3];
+    [DTools setLable:self.jineLb Font:DFont_11 titleColor:DColor_c4291f backColor:DColor_f3f3f3];
+    [DTools setLable:self.lab_4 Font:DFont_11 titleColor:DColor_f69a2b backColor:DColor_f3f3f3];
+    [DTools setLable:self.lab_5 Font:DFont_12 titleColor:DColor_808080 backColor:DColor_f3f3f3];
+    [DTools setButtton:self.forgetBut Font:DFont_11 titleColor:DColor_c4291f backColor:DColor_f3f3f3];
+    [DTools setButtton:self.applyForBtn Font:DFont_13 titleColor:DColor_ffffff backColor:DColor_c4291f];
+    
+    self.jineLb.lineBreakMode = NSLineBreakByCharWrapping;
+    CGSize size = [self.jineLb sizeThatFits:CGSizeMake(MAXFLOAT, 21)];
+    self.jineLb.frame = CGRectMake(self.jineLb.frame.origin.x, self.jineLb.frame.origin.y, size.width, 21);
+    self.lab_3.frame  = CGRectMake(self.jineLb.frame.origin.x + size.width + 8, self.lab_3.frame.origin.y, 32, 21);
+
+
+    [self setNaviBarTitle:@"转账"];
+    
+    self.jineTf.layer.cornerRadius = 3.0f;
+    self.jineTf.layer.masksToBounds= YES;
+    self.jineTf.layer.borderColor = DColor_line_bg.CGColor;
+    self.jineTf.layer.borderWidth = 1.0f;
+    
+    self.passwordTf.layer.cornerRadius = 3.0f;
+    self.passwordTf.layer.masksToBounds = YES;
+    self.passwordTf.layer.borderWidth = 1.0f;
+    self.passwordTf.layer.borderColor = DColor_line_bg.CGColor;
+    [self.passwordTf setSecureTextEntry:YES];
+    
+    self.applyForBtn.layer.cornerRadius = 3.0f;
+    self.applyForBtn.layer.masksToBounds= YES;
+    
+    self.jineLb.text = self.totalAccount;
+    self.jineTf.placeholder = @"转账金额必须大于100!";
+}
+
+
+- (IBAction)forgetPasswordBtnAction:(id)sender {
+    DVerifyPhoneNumViewController *vc = [[DVerifyPhoneNumViewController alloc]initWithNibName:@"DVerifyPhoneNumViewController" bundle:nil];
+    vc.verigyTape = password2_verify;
+    NSDictionary *userInfoDic = [[NSDictionary alloc]init];
+    userInfoDic = [[FileOperation readFileToDictionary:dajikeUser]mutableCopy];
+    UserInfoModel *model = [[UserInfoModel alloc]init];
+    model = [JsonStringTransfer dictionary:userInfoDic ToModel:model];
+    vc.userModel = model;
+    [self.navigationController pushViewController:vc animated:YES];
+}
+- (IBAction)applyForBtnAction:(id)sender {
+    [self myBanksTiXian];
+}
+
+- (void)myBanksTiXian{
+    NSDictionary *parameter = @{@"userId":[FileOperation getUserId],@"type":self.type,@"jine":self.jineTf.text,@"password":[DES3Util encrypt:self.passwordTf.text]};
+    
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyBanks.tixian" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            NSLog(@"result = %@",responseObject.result);
+            [ProgressHUD showMessage:@"请求成功，等待处理！" Width:100 High:80];
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+        else
+        {
+            if ([responseObject.msg length] == 0) {
+                [ProgressHUD showMessage:@"请求失败" Width:100 High:80];
+            }else
+                [ProgressHUD showMessage:responseObject.msg Width:100 High:80];
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+    
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

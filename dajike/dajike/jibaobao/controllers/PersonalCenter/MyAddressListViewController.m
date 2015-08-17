@@ -1,0 +1,301 @@
+//
+//  MyAddressListViewController.m
+//  jibaobao
+//
+//  Created by dajike on 15/5/11.
+//  Copyright (c) 2015年 dajike. All rights reserved.
+//
+
+#import "MyAddressListViewController.h"
+#import "AddressManageCell.h"
+#import "defines.h"
+#import "MyAddressEditingViewController.h"
+#import "MyAddressModel.h"
+
+@interface MyAddressListViewController ()<UIAlertViewDelegate>
+{
+    NSMutableArray *dataArray;
+    
+    int _deleteBtnTag;
+}
+@end
+
+@implementation MyAddressListViewController
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+        titleLabel.text = @"地址管理";
+        
+        
+        
+    }
+    return self;
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    dataArray = [[NSMutableArray alloc]init];
+    _deleteBtnTag = 0;
+    
+    [self addTableView:UITableViewStyleGrouped];
+    [self setNavType:SEARCH_BUTTON];
+    [self setSearchBtnHidden:YES];
+    [self setScrollBtnHidden:YES];
+    self.mainTabview.delegate = self;
+    self.mainTabview.dataSource = self;
+    
+    self.mainTabview.frame = CGRectMake(0, 0, WIDTH_CONTROLLER_DEFAULT, HEIGHT_CONTROLLER_DEFAULT - 64 - 49);
+    
+    [self addTableViewFootView];
+    
+//    [self getData];
+}
+- (void)viewWillAppear:(BOOL)animated
+{
+    [dataArray removeAllObjects];
+    [self getData];
+}
+
+- (void)getData
+{
+    if (self.userId == nil) {
+        return;
+    }
+    NSDictionary *parameter = @{@"userId":self.userId};
+    
+    [[MyAfHTTPClient sharedClient]postPathWithMethod:@"MyAddress.list" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            NSLog(@"result = %@",responseObject.result);
+             NSString *jsonStr = [AnalysisData decodeToString:responseObject.result];
+            NSMutableArray *arr = [[JsonStringTransfer jsonStringToDictionary:jsonStr]mutableCopy];
+            
+            for (int i=0; i<arr.count; i++) {
+                MyAddressModel *model = [[MyAddressModel alloc]init];
+                model = [JsonStringTransfer dictionary:[arr objectAtIndex:i] ToModel:model];
+                [arr replaceObjectAtIndex:i withObject:model];
+            }
+            [dataArray addObjectsFromArray:arr];
+            
+            [self.mainTabview reloadData];
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+//添加footView 新增收获地址按钮
+- (void) addTableViewFootView
+{
+    UIView *footView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, WIDTH_CONTROLLER_DEFAULT, 100)];
+    footView.backgroundColor = Color_Clear;
+    UIButton *btn = [[UIButton alloc]initWithFrame:CGRectMake(15, 40, WIDTH_CONTROLLER_DEFAULT-30, 30)];
+    btn.backgroundColor = Color_mainColor;
+    [btn setTitle:@"新增收货地址" forState:UIControlStateNormal];
+    [btn setTintColor:[UIColor whiteColor]];
+    [btn addTarget:self action:@selector(toShouhuoButton:) forControlEvents:UIControlEventTouchUpInside];
+    [footView addSubview:btn];
+    self.mainTabview.tableFooterView = footView;
+}
+
+
+#pragma mark------
+#pragma mark------uitableViewDelegate uitableViewDatasource--------
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return dataArray.count;
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 90;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSInteger row = indexPath.row;
+    AddressManageCell *cell = [self loadAddressManageCell:self.mainTabview];
+    MyAddressModel *model = [dataArray objectAtIndex:indexPath.row];
+    cell.model = [dataArray objectAtIndex:indexPath.row];
+    NSLog(@"%@",model.state);
+    if ([model.state isEqualToString:@"<null>"] ) {
+        [cell.statusImageView setImage:[UIImage imageNamed:@"img_yo_sel"]];
+    }else if ([model.state intValue] == 1) {
+        [cell.statusImageView setImage:[UIImage imageNamed:@"img_yo_sel"]];
+    }else{
+        [cell.statusImageView setImage:[UIImage imageNamed:@"img_yes_sel"]];
+    }
+    cell.editButton.tag = row+100;
+    cell.delateButton.tag = row+200;
+    [cell.editButton addTarget:self action:@selector(editAddress:) forControlEvents:UIControlEventTouchUpInside];
+    [cell.delateButton addTarget:self action:@selector(dalateAddress:) forControlEvents:UIControlEventTouchUpInside];
+    return cell;
+}
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    //取消点击选中状态
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
+    MyAddressModel *model = [[MyAddressModel alloc]init];
+    model = [dataArray objectAtIndex:indexPath.row];
+    NSDictionary *parameter = @{@"userId":self.userId,@"addressId":model.addrId};
+    
+    [[MyAfHTTPClient sharedClient]postPathWithMethod:@"MyAddress.saveDefault" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            NSLog(@"result = %@",responseObject.result);
+            NSLog(@"设置默认地址成功");
+            for (int i=0; i<dataArray.count; i++){
+                MyAddressModel *model1 = [dataArray objectAtIndex:i];
+                if (indexPath.row == i) {
+                    if ([model1.state intValue] == 1) {
+                        model1.state = @"0";
+                    }else{
+                        model1.state = @"1";
+                    }
+                }else{
+                    model1.state = @"1";
+                }
+                
+                [dataArray replaceObjectAtIndex:i withObject:model1];
+            }
+            if ([self.flagStr isEqualToString:@"FillInIndentViewController"]) {
+                MyAddressModel *model2 = [dataArray objectAtIndex:indexPath.row];
+                if ([model2.state isEqualToString:@"0"]) {
+                    self.mBlock(model2);
+                    [self.navigationController popViewControllerAnimated:YES];
+                }
+                
+            }
+            [tableView reloadData];
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+    
+//    [tableView reloadData];
+}
+#pragma mark------
+#pragma mark------loadTableView--------
+- (AddressManageCell *)loadAddressManageCell:(UITableView *)tableView
+{
+    NSString * const nibName  = @"AddressManageCell";
+    
+    AddressManageCell *cell = [tableView dequeueReusableCellWithIdentifier:nibName];
+    
+    if (cell == nil) {
+        [tableView registerNib:[UINib nibWithNibName:nibName bundle:nil] forCellReuseIdentifier:nibName];
+        cell = [tableView dequeueReusableCellWithIdentifier:nibName];
+    }
+    
+    return cell;
+}
+
+//新增收货地址
+-(void) toShouhuoButton:(id) sender
+{
+    MyAddressEditingViewController *MyAddressEditingVC = [[MyAddressEditingViewController alloc]initWithNibName:nil bundle:nil];
+    MyAddressEditingVC.flagStr = @"1";
+    MyAddressEditingVC.comeFrom = self.flagStr;
+    [MyAddressEditingVC callBackAddressEdit:^(int flag,MyAddressModel *addressModel) {
+//        [dataArray removeAllObjects];
+//        [self getData];
+//        if ([self.flagStr isEqualToString:@"FillInIndentViewController"]) {
+//            self.mBlock(addressModel);
+//            [self.navigationController popViewControllerAnimated:YES];
+//        }
+    }];
+    MyAddressEditingVC.userId = self.userId;
+    [self.navigationController pushViewController:MyAddressEditingVC animated:YES];
+}
+
+//编辑收货地址
+- (void) editAddress:(id)sender
+{
+    UIButton *btn = (UIButton *)sender;
+    NSInteger row = btn.tag - 100;
+    NSLog(@"%ld",(long)row);
+    MyAddressEditingViewController *MyAddressEditingVC = [[MyAddressEditingViewController alloc]initWithNibName:nil bundle:nil];
+    MyAddressEditingVC.flagStr = @"2";
+    MyAddressEditingVC.comeFrom = self.flagStr;
+    [MyAddressEditingVC callBackAddressEdit:^(int flag,MyAddressModel *addressModel) {
+//        [dataArray removeAllObjects];
+//        [self getData];
+//        if ([self.flagStr isEqualToString:@"FillInIndentViewController"]) {
+//            
+//            [self.navigationController popViewControllerAnimated:YES];
+//            self.mBlock(addressModel);
+//        }
+    }];
+    MyAddressEditingVC.userId = self.userId;
+    MyAddressEditingVC.model = [dataArray objectAtIndex:row];
+    [self.navigationController pushViewController:MyAddressEditingVC animated:YES];
+}
+//删除收货地址
+- (void) dalateAddress:(id) sender
+{
+    UIButton *btn = (UIButton *)sender;
+    _deleteBtnTag = (int)(btn.tag - 200);
+    NSLog(@"%d",_deleteBtnTag);
+    
+    UIAlertView *alertView = [[UIAlertView alloc]initWithTitle:@"提示" message:@"确定要删除该收货地址吗" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+    [alertView show];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0) {
+        NSLog(@"取消");
+    }else {
+        NSLog(@"确定");
+        MyAddressModel *model = [dataArray objectAtIndex:_deleteBtnTag];
+        
+        NSDictionary *parameter = @{@"userId":self.userId,@"addressId":model.addrId};
+        
+        [[MyAfHTTPClient sharedClient]postPathWithMethod:@"MyAddress.delete" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+            if (responseObject.succeed) {
+                NSLog(@"result = %@",responseObject.result);
+                [dataArray removeObjectAtIndex:_deleteBtnTag];
+                [self.mainTabview reloadData];
+            }
+            else
+            {
+                [ProgressHUD showMessage:responseObject.msg Width:100 High:80];
+            }
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            NSLog(@"error = %@",error);
+            NSLog(@"operation6 = %@",operation);
+        }];
+    }
+}
+- (void)callBackAddress:(CallBackAddressBlock)block
+{
+    self.mBlock = block;
+}
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

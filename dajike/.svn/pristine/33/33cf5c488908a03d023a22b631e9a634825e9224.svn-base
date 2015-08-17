@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7702" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell222" rowHeight="80" id="KGk-i7-Jjw" customClass="CashCouponCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="¥89" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S4a-Cv-8l7">
+                        <rect key="frame" x="8" y="15" width="40" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="30" id="o1J-hJ-IrU"/>
+                            <constraint firstAttribute="width" constant="40" id="yxC-ej-1Ta"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                        <color key="textColor" red="0.79607843137254897" green="0.078431372549019607" blue="0.28235294117647058" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7fu-B7-bHC" customClass="OriPriceLabel">
+                        <rect key="frame" x="49" y="15" width="25" height="30"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="25" id="X1v-fK-rPo"/>
+                            <constraint firstAttribute="height" constant="30" id="Z5j-xv-dke"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="100元代金券一张，可叠加40张，免预约，提供免费WiFi" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NAE-qD-4Hy">
+                        <rect key="frame" x="83" y="3" width="229" height="34"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="34" id="RL8-6b-xTR"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" red="0.47450980392156861" green="0.47450980392156861" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="50%累计抽奖" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="srK-Jj-6dh">
+                        <rect key="frame" x="83" y="37" width="124" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="Wgl-69-TYh"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" red="0.79607843137254897" green="0.078431372549019607" blue="0.28235294117647058" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="已售1000" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WEf-tW-nAo">
+                        <rect key="frame" x="228" y="37" width="84" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="84" id="Tgd-D2-Nyx"/>
+                            <constraint firstAttribute="height" constant="20" id="yTM-Fz-hJY"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="7fu-B7-bHC" firstAttribute="leading" secondItem="S4a-Cv-8l7" secondAttribute="trailing" constant="1" id="6Cv-H6-7sP"/>
+                    <constraint firstItem="7fu-B7-bHC" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="15" id="8HW-yq-7td"/>
+                    <constraint firstAttribute="trailing" secondItem="NAE-qD-4Hy" secondAttribute="trailing" constant="8" id="Cl8-Nt-Cg1"/>
+                    <constraint firstItem="srK-Jj-6dh" firstAttribute="top" secondItem="NAE-qD-4Hy" secondAttribute="bottom" id="IvM-zx-lqg"/>
+                    <constraint firstAttribute="bottom" secondItem="WEf-tW-nAo" secondAttribute="bottom" constant="2" id="NS7-DM-WGz"/>
+                    <constraint firstItem="NAE-qD-4Hy" firstAttribute="leading" secondItem="7fu-B7-bHC" secondAttribute="trailing" constant="9" id="Pmn-H1-fg9"/>
+                    <constraint firstItem="WEf-tW-nAo" firstAttribute="leading" secondItem="srK-Jj-6dh" secondAttribute="trailing" constant="21" id="SqQ-g4-Thr"/>
+                    <constraint firstAttribute="trailing" secondItem="WEf-tW-nAo" secondAttribute="trailing" constant="8" id="U1M-Hd-gfS"/>
+                    <constraint firstItem="NAE-qD-4Hy" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="3" id="hoN-s4-kjE"/>
+                    <constraint firstItem="S4a-Cv-8l7" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="mi7-uu-rwP"/>
+                    <constraint firstItem="srK-Jj-6dh" firstAttribute="leading" secondItem="7fu-B7-bHC" secondAttribute="trailing" constant="9" id="sQh-Ti-k1t"/>
+                    <constraint firstItem="S4a-Cv-8l7" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="15" id="vTI-Vs-U7E"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="cellOutLb" destination="WEf-tW-nAo" id="edR-go-8RO"/>
+                <outlet property="discriptionLb" destination="NAE-qD-4Hy" id="PN7-cJ-PYv"/>
+                <outlet property="lotteryLb" destination="srK-Jj-6dh" id="JeM-Mj-6f7"/>
+                <outlet property="norPriceWidthCon" destination="X1v-fK-rPo" id="elA-u7-4hQ"/>
+                <outlet property="notPriceLb" destination="7fu-B7-bHC" id="vDF-yZ-7T6"/>
+                <outlet property="priceLb" destination="S4a-Cv-8l7" id="3ru-N5-zKx"/>
+                <outlet property="priceWidthCon" destination="yxC-ej-1Ta" id="Tp2-VS-mMT"/>
+            </connections>
+            <point key="canvasLocation" x="361" y="451"/>
+        </tableViewCell>
+    </objects>
+</document>

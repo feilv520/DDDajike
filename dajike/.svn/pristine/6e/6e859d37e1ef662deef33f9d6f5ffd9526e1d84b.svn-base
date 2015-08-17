@@ -1,0 +1,40 @@
+//
+//  DgouwucheCell.m
+//  dajike
+//
+//  Created by swb on 15/7/9.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DgouwucheCell.h"
+
+@implementation DgouwucheCell
+
+- (void)awakeFromNib {
+    // Initialization code
+    self.selectBtn.selected = NO;
+    [self.selectBtn setImageEdgeInsets:UIEdgeInsetsMake(21, 10, 22, 10)];
+    [self.jianBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 10, 5, 0)];
+    [self.jiaBtn setImageEdgeInsets:UIEdgeInsetsMake(5, 0, 5, 10)];
+    self.buyNumLb.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    self.buyNumLb.layer.borderWidth = 0.5f;
+    [self.selectBtn setImage:[UIImage imageNamed:@"img_car_04"] forState:UIControlStateNormal];
+    [self.selectBtn setImage:[UIImage imageNamed:@"img_car_02"] forState:UIControlStateSelected];
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+- (IBAction)btnClicked:(id)sender {
+    UIButton *btn = (UIButton *)sender;
+    btn.selected = !btn.selected;
+    self.block((int)btn.tag);
+}
+- (void)callBtnClicked:(CallBtnClicked)block
+{
+    self.block = block;
+}
+@end

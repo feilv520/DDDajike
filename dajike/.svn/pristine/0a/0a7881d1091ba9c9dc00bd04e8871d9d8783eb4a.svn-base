@@ -1,0 +1,362 @@
+//
+//  DClassificationViewController.m
+//  dajike
+//
+//  Created by apple on 15/7/8.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+/*
+
+    分类模块  --  首页
+ 
+ */
+
+#import "DSJShouYeViewController.h"
+#import "DClassificationViewController.h"
+#import "DClassTableViewCell.h"
+#import "dDefine.h"
+#import "DClassDetailTableViewCell.h"
+#import "DGeneralHongBaoViewController.h"
+#import "GeneralHongBaoViewController.h"
+#import "DGoodsListViewController.h"
+#import "DJiFenViewController.h"
+#import "DJiFenShopViewController.h"
+#import "DClassModel.h"
+
+@interface DClassificationViewController () <UITableViewDataSource, UITableViewDelegate>{
+    NSMutableArray *detailArray;
+}
+
+@property (nonatomic, strong) UITableView *classTableView;
+
+@property (nonatomic, strong) UITableView *detailTableView;
+
+@property (nonatomic, strong) NSDictionary *dictionary;
+
+@property (nonatomic, strong) DImgButton *searchButton;
+
+@property (nonatomic, strong) UIView *secondView;
+
+@property (nonatomic, strong) UIView *thirdView;
+
+@property (nonatomic, strong) NSArray *array;
+
+@property (nonatomic, strong) NSMutableArray *mArray;
+
+@property (nonatomic, strong) UIImageView *leftAngle;
+
+@property (nonatomic, strong) UIImageView *secoundLeftAngle;
+
+@property (nonatomic, strong) NSMutableArray *oneArray;
+
+@property (nonatomic, strong) NSIndexPath *oneIndexPath;
+
+@property (nonatomic, strong) NSIndexPath *twoIndexPath;
+
+@property (nonatomic, strong) NSString *detailString;
+
+@end
+
+@implementation DClassificationViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setNaviBarTitle:@"分类"];
+    
+    self.searchButton = [DBaseNavView createNavBtnWithImgNormal:@"img_pub_01" imgHighlight:@"img_pub_01" imgSelected:@"img_pub_01" target:self action:@selector(navRightButtonTapped:)];
+    
+    [self setNaviBarRightBtn:self.searchButton];
+    
+    [self addTableView:NO];
+    self.dMainTableView.dataSource = self;
+    self.dMainTableView.delegate = self;
+    [self.dMainTableView setFrame:DRect(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT-44-50)];
+    
+//    self.dMainTableView.tableFooterView = [UIView new];
+    
+    [self.dMainTableView registerNib:[UINib nibWithNibName:@"DClassTableViewCell" bundle:nil] forCellReuseIdentifier:@"reuse"];
+    
+//    [self.view addSubview:self.dMainTableView];
+
+    self.secondView = [[UIView alloc] initWithFrame:CGRectMake(DWIDTH_CONTROLLER_DEFAULT + 5, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT - 44)];
+    
+    self.secondView.backgroundColor = [UIColor lightGrayColor];
+    
+    self.secondView.layer.shadowColor=[UIColor blackColor].CGColor;
+    self.secondView.layer.shadowOffset=CGSizeMake(-1, 10);
+    self.secondView.layer.shadowOpacity=0.5;
+    self.secondView.layer.shadowRadius=5;
+    
+    self.leftAngle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"iconfont-zuoshixinjiantou"] highlightedImage:[UIImage imageNamed:@"iconfont-zuoshixinjiantou"]];
+    self.leftAngle.frame = CGRectMake(-20, 76, 32, 32);
+    self.leftAngle.hidden = YES;
+    
+    self.leftAngle.layer.shadowColor=[UIColor blackColor].CGColor;
+    self.leftAngle.layer.shadowOffset=CGSizeMake(-1, -1);
+    self.leftAngle.layer.shadowOpacity=0.5;
+    self.leftAngle.layer.shadowRadius=5;
+    
+    [self.secondView addSubview:self.leftAngle];
+    
+    self.classTableView = [[UITableView alloc] initWithFrame:CGRectMake(1, 64, self.secondView.frame.size.width - 90, self.secondView.frame.size.height - 64 - 49) style:UITableViewStylePlain];
+    
+    self.classTableView.delegate = self;
+    self.classTableView.dataSource = self;
+    
+    [self.classTableView registerNib:[UINib nibWithNibName:@"DClassDetailTableViewCell" bundle:nil] forCellReuseIdentifier:@"class"];
+    
+    [self.secondView addSubview:self.classTableView];
+    
+    [self.view addSubview:self.secondView];
+    
+    self.thirdView = [[UIView alloc] initWithFrame:CGRectMake(DWIDTH_CONTROLLER_DEFAULT + 5, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT - 44)];
+    
+    self.thirdView.backgroundColor = [UIColor lightGrayColor];
+    
+    self.thirdView.layer.shadowColor=[UIColor blackColor].CGColor;
+    self.thirdView.layer.shadowOffset=CGSizeMake(-1, 10);
+    self.thirdView.layer.shadowOpacity=0.5;
+    self.thirdView.layer.shadowRadius=5;
+    
+    self.secoundLeftAngle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"iconfont-zuojiantou"] highlightedImage:[UIImage imageNamed:@"iconfont-zuojiantou"]];
+    self.secoundLeftAngle.frame = CGRectMake(-20, 76, 32, 32);
+    self.secoundLeftAngle.hidden = YES;
+    
+    self.secoundLeftAngle.layer.shadowColor=[UIColor blackColor].CGColor;
+    self.secoundLeftAngle.layer.shadowOffset=CGSizeMake(-1, -1);
+    self.secoundLeftAngle.layer.shadowOpacity=0.5;
+    self.secoundLeftAngle.layer.shadowRadius=5;
+
+    [self.thirdView addSubview:self.secoundLeftAngle];
+    
+    self.detailTableView = [[UITableView alloc] initWithFrame:CGRectMake(1, 64, self.thirdView.frame.size.width - 160, self.thirdView.frame.size.height - 64) style:UITableViewStylePlain];
+    
+    self.detailTableView.backgroundColor = [UIColor colorWithRed:244 / 255.0 green:244 / 255.0 blue:244 / 255.0 alpha:1.0f];
+    
+    self.detailTableView.delegate = self;
+    self.detailTableView.dataSource = self;
+    
+    [self.detailTableView registerNib:[UINib nibWithNibName:@"DClassDetailTableViewCell" bundle:nil] forCellReuseIdentifier:@"class"];
+    
+    [self.thirdView addSubview:self.detailTableView];
+    
+    [self.view addSubview:self.thirdView];
+    
+    [self bringNaviBarToTopmost];
+    
+    [self loadingData:nil];
+}
+
+#pragma tableView delegate function
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0.5f;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.5f;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (tableView == self.dMainTableView) {
+        
+        DClassTableViewCell *cell  = [tableView dequeueReusableCellWithIdentifier:@"reuse"];
+        
+        cell.nameLabel.text = [[[self.oneArray objectAtIndex:indexPath.row] objectForKey:@"oneName"] cate_name];
+        cell.detailLabel.text = [detailArray objectAtIndex:indexPath.row];
+        [cell.photoImageView setImageWithURL:[NSURL URLWithString:[[[self.oneArray objectAtIndex:indexPath.row] objectForKey:@"oneName"] imgUrl]]];
+        
+        return cell;
+        
+    } else if(tableView == self.classTableView){
+        DClassDetailTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"class"];
+        
+        cell.contentView.backgroundColor = [UIColor whiteColor];
+        cell.classLabel.text = [[[[[self.oneArray objectAtIndex:self.oneIndexPath.row] objectForKey:@"twoArray"] objectAtIndex:indexPath.row] objectForKey:@"twoName"]cate_name];
+        
+        return cell;
+    } else {
+        DClassDetailTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"class"];
+        
+        cell.classLabel.text = [[[[[[self.oneArray objectAtIndex:self.oneIndexPath.row] objectForKey:@"twoArray"] objectAtIndex:self.twoIndexPath.row] objectForKey:@"threeArray"] objectAtIndex:indexPath.row] cate_name];
+        
+        return cell;
+    }
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    if (tableView == self.dMainTableView)
+        return self.oneArray.count;
+    else if (tableView == self.classTableView)
+        return [[[self.oneArray objectAtIndex:self.oneIndexPath.row] objectForKey:@"twoArray"] count];
+    else
+        return [[[[[self.oneArray objectAtIndex:self.oneIndexPath.row] objectForKey:@"twoArray"] objectAtIndex:self.twoIndexPath.row] objectForKey:@"threeArray"] count];
+    return 0;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    if (tableView == self.dMainTableView){
+        [UIView animateWithDuration:0.4f animations:^{
+            self.secondView.frame = CGRectMake(90, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT - 64 - 44);
+            self.classTableView.frame = CGRectMake(1, 64, DWIDTH_CONTROLLER_DEFAULT - 90, DHEIGHT_CONTROLLER_DEFAULT - 64 - 44);
+            self.thirdView.frame = CGRectMake(DWIDTH_CONTROLLER_DEFAULT, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT- 64 - 44);
+//            self.mArray = [self.array objectAtIndex:self.oneIndexPath.row];
+            self.secoundLeftAngle.hidden = YES;
+            self.oneIndexPath = indexPath;
+            [self.classTableView reloadData];
+        } completion:^(BOOL finished) {
+            self.leftAngle.hidden = NO;
+            self.leftAngle.frame = CGRectMake(-20, 76 + 58 * indexPath.row, 32, 32);
+        }];
+    } else if (tableView == self.classTableView){
+        [UIView animateWithDuration:0.4f animations:^{
+            self.secondView.frame = CGRectMake(90, 0, 70, DHEIGHT_CONTROLLER_DEFAULT - 44);
+            self.classTableView.frame = CGRectMake(1, 64, 100, self.secondView.frame.size.height - 64);
+            self.thirdView.frame = CGRectMake(160, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT - 44);
+//            self.mArray = [self.array objectAtIndex:self.twoIndexPath.row];
+            self.twoIndexPath = indexPath;
+            [self.detailTableView reloadData];
+        } completion:^(BOOL finished) {
+            self.secoundLeftAngle.hidden = NO;
+            self.secoundLeftAngle.frame = CGRectMake(-20, 76 + 58 * (indexPath.row - (self.classTableView.contentOffset.y / 58.0)), 32, 32);
+        }];
+    } else {
+        DGoodsListViewController *goodsListVC = [[DGoodsListViewController alloc] init];
+        goodsListVC.cateId = [NSString stringWithFormat:@"%ld",[[[[[[self.oneArray objectAtIndex:self.oneIndexPath.row] objectForKey:@"twoArray"] objectAtIndex:self.twoIndexPath.row] objectForKey:@"threeArray"] objectAtIndex:indexPath.row] cate_id]];
+        [self.navigationController pushViewController:goodsListVC animated:YES];
+    }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return 58;
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    if (scrollView == self.classTableView) {
+        [UIView animateWithDuration:0.1f animations:^{
+            self.secondView.frame = CGRectMake(90, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT - 64 - 44);
+            self.classTableView.frame = CGRectMake(1, 64, DWIDTH_CONTROLLER_DEFAULT - 90, DHEIGHT_CONTROLLER_DEFAULT - 64 - 44);
+            self.thirdView.frame = CGRectMake(DWIDTH_CONTROLLER_DEFAULT, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT- 64 - 44);
+            self.secoundLeftAngle.hidden = YES;
+            [self.classTableView reloadData];
+        } completion:^(BOOL finished) {
+            self.leftAngle.hidden = NO;
+        }];
+    } else if (scrollView == self.dMainTableView){
+        [UIView animateWithDuration:0.1f animations:^{
+            self.secondView.frame = CGRectMake(DWIDTH_CONTROLLER_DEFAULT, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT - 64 - 44);
+            self.classTableView.frame = CGRectMake(1, 64, DWIDTH_CONTROLLER_DEFAULT - 90, DHEIGHT_CONTROLLER_DEFAULT - 64 - 44);
+            self.thirdView.frame = CGRectMake(DWIDTH_CONTROLLER_DEFAULT, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT- 64 - 44);
+            self.secoundLeftAngle.hidden = YES;
+            [self.classTableView reloadData];
+        } completion:^(BOOL finished) {
+            self.leftAngle.hidden = YES;
+        }];
+
+    }
+}
+
+- (void)navRightButtonTapped:(id) sender
+{
+    //红包
+//    DGeneralHongBaoViewController *dgHBVC = [[DGeneralHongBaoViewController alloc] init];
+//    [self.navigationController pushViewController:dgHBVC animated:YES];
+    //商品列表
+    DGoodsListViewController *goodsListVC = [[DGoodsListViewController alloc] init];
+    [self.navigationController pushViewController:goodsListVC animated:YES];
+    //兑换积分
+//    DJiFenViewController *jifenVC = [[DJiFenViewController alloc] init];
+//    [self.navigationController pushViewController:jifenVC animated:YES];
+    //积分商城首页
+//    DJiFenShopViewController *shopVC = [[DJiFenShopViewController alloc] init];
+//    [self.navigationController pushViewController:shopVC animated:YES];
+    //商家首页
+//    DSJShouYeViewController *sjShouYeVC = [[DSJShouYeViewController alloc] init];
+//    [self.navigationController pushViewController:sjShouYeVC animated:YES];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)loadingData:(NSString *)orderString{
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"Goods.goodsCategory" parameters:nil ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            NSArray *dataArr = responseObject.result;
+            self.oneArray = [NSMutableArray array];
+            detailArray = [NSMutableArray array];
+            NSLog(@"%@",responseObject.result);
+            NSInteger count = 0;
+            for (NSDictionary *dic in dataArr) {
+                DClassModel *classM = [[DClassModel alloc] init];
+                [classM setValuesForKeysWithDictionary:dic];
+                NSMutableArray *twoArray = [NSMutableArray array];
+                NSDictionary *oneDic = [NSDictionary dictionaryWithObjectsAndKeys:classM,@"oneName",twoArray,@"twoArray", nil];
+                [self.oneArray addObject:oneDic];
+                self.detailString = nil;
+                count = 0;
+                for (NSDictionary *dDic in [dic objectForKey:@"two"]) {
+                    NSMutableArray *threeArray = [NSMutableArray array];
+                    DClassModel *classM = [[DClassModel alloc] init];
+                    [classM setValuesForKeysWithDictionary:dDic];
+                    NSDictionary *twoDic = [[NSDictionary alloc] initWithObjectsAndKeys:classM,@"twoName",threeArray,@"threeArray", nil];
+                    NSDictionary *oneDic = [self.oneArray lastObject];
+                    NSMutableArray *twoArray = [oneDic objectForKey:@"twoArray"];
+                    [twoArray addObject:twoDic];
+                    count++;
+                    if (self.detailString == nil) {
+                        self.detailString = classM.cate_name;
+                    } else if(count <= 3){
+                        self.detailString = [NSString stringWithFormat:@"%@,%@",self.detailString,classM.cate_name];
+                    }
+                    
+                    for (NSDictionary *dDDic in [dDic objectForKey:@"three"]) {
+                       
+                        DClassModel *classM = [[DClassModel alloc] init];
+                        [classM setValuesForKeysWithDictionary:dDDic];
+                        NSDictionary *oneDic = [self.oneArray lastObject];
+                        NSMutableArray *twoArray = [oneDic objectForKey:@"twoArray"];
+                        NSDictionary *twoDic = [twoArray lastObject];
+                        NSMutableArray *threeArray = [twoDic objectForKey:@"threeArray"];
+                        [threeArray addObject:classM];
+                        
+                    }
+                }
+                NSLog(@"%@",self.detailString);
+                [detailArray addObject:self.detailString];
+            }
+            [self.dMainTableView reloadData];
+            [self.classTableView reloadData];
+            [self.detailTableView reloadData];
+            NSLog(@"%ld",[[[self.oneArray objectAtIndex:0] objectForKey:@"twoArray"] count]);
+        } else {
+            if ([responseObject.msg length] == 0) {
+                [ProgressHUD showMessage:@"请求失败" Width:100 High:80];
+            }else
+                [ProgressHUD showMessage:responseObject.msg Width:100 High:80];
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+}
+
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

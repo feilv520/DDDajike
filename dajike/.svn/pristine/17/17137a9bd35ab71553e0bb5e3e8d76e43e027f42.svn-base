@@ -1,0 +1,307 @@
+//
+//  DBackNavigationViewController.m
+//  dajike
+//
+//  Created by dajike on 15/7/7.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DBackNavigationViewController.h"
+#import "DBackNavigationViewController.h"
+#import "DBaseNavView.h"
+#import "SWBTabBarController.h"
+#import "dDefine.h"
+
+@interface DBackNavigationViewController ()<UITableViewDelegate>
+@property (nonatomic, readonly) DBaseNavView *m_viewNaviBar;
+
+@end
+
+@implementation DBackNavigationViewController
+@synthesize m_viewNaviBar = _viewNaviBar;
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        
+    }
+    return self;
+}
+
+- (void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:YES];
+//    if (self.navigationController) {
+//        [self.navigationController setNavigationBarHidden:NO animated:NO];
+//        self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+//        //        [self.navigationController.navigationBar setBackgroundColor:[UIColor whiteColor]];
+//        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"a.png"] forBarMetrics:UIBarMetricsDefault];
+//        self.navigationController.navigationBar.layer.shadowOpacity = YES;
+//  [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+//    }
+    if (_viewNaviBar && !_viewNaviBar.hidden)
+    {
+        [self.view bringSubviewToFront:_viewNaviBar];
+        
+        //隐藏底部tabBar
+        SWBTabBarController *tabBarC = [SWBTabBarController sharedManager];
+        [tabBarC.tabBar setHidden:YES];
+    }else{}
+}
+
+- (void) viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    //底部tabBar显现
+    SWBTabBarController *jTabBarVC = [SWBTabBarController sharedManager];
+    [jTabBarVC.tabBar setHidden:NO];
+    
+    //视图退出后 凡是有键盘的  键盘退出
+//    for (UIView *View in self.view.subviews) {
+//        [View endEditing:YES];
+//    }
+    [self.view endEditing:YES];
+    
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    self.view.backgroundColor = DColor_White;
+    _viewNaviBar = [[DBaseNavView alloc] initWithFrame:DRect(0.0f, 0.0f, [DBaseNavView barSize].width, [DBaseNavView barSize].height)];
+    _viewNaviBar.m_viewCtrlParentVC = self;
+    [self.view addSubview:_viewNaviBar];
+    
+//    [self.view setBackgroundColor:[UIColor colorWithPatternImage:[[UIImage imageNamed:@"GlobalBg"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 0, 0)]]];
+    
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark ------- 添加基类tableview ---------------
+- (void)addTableView:(BOOL)isNeedRefresh
+{
+    self.dMainTableView = [[UITableView alloc]initWithFrame:DRect(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT) style:UITableViewStyleGrouped];
+    self.dMainTableView.delegate = self;
+    [self.view addSubview:self.dMainTableView];
+    
+    //添加无数据时的显示界面，正常情况下隐藏
+    self.noDataView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"loading_no_s"]];
+    self.noDataView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.noDataView setFrame:CGRectMake(0, 0, self.dMainTableView.frame.size.width, self.dMainTableView.frame.size.height)];
+    [self.dMainTableView addSubview:self.noDataView];
+    [self.noDataView setHidden:YES];
+    
+    //  列表 cell 从头开始显示  需要实现一个代理方法
+    if ([self.dMainTableView respondsToSelector:@selector(setSeparatorInset:)]) {
+        [self.dMainTableView setSeparatorInset:UIEdgeInsetsZero];
+    }
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+    if ([self.dMainTableView respondsToSelector:@selector(setLayoutMargins:)]) {
+        [self.dMainTableView setLayoutMargins:UIEdgeInsetsZero];
+    }
+#endif
+    
+    if (isNeedRefresh) {
+        [self addHeaderAndFooter];
+    }
+    
+}
+
+#pragma mark -
+/**--------------------------------------------------------------------------------------
+ *  集成刷新控件
+ */
+//加载数据
+- (void) loadData:(void (^)(BOOL finish))success
+{
+    //    [self otherFourList:0 :^(BOOL finish) {
+    //        success(finish);
+    //    }];
+    success(YES);
+}
+
+//刷新数据
+- (void) refreshData:(void (^)(BOOL finish))success
+{
+    //重新加载数据。一切都重新初始化
+    [self.footer resetNoMoreData];
+    
+    [self loadData:^(BOOL finish) {
+        success(finish);
+    }];
+}
+
+//加载下拉刷新和上拉加载
+- (void) addHeaderAndFooter
+{
+    // 设置回调（一旦进入刷新状态，就调用target的action，也就是调用self的loadNewData方法）
+    self.header = [MJRefreshGifHeader headerWithRefreshingBlock:^{
+        [self refreshData:^(BOOL finish) {
+            [self.header endRefreshing];
+        }];
+    }];
+    //设置图片
+    [self.header prepare];
+    
+    // 设置普通状态的动画图片
+    NSMutableArray *idleImages = [NSMutableArray array];
+    UIImage *image = [UIImage imageNamed:@"1.png"];
+    [idleImages addObject:image];
+    UIImage *image1 = [UIImage imageNamed:@"2.png"];
+    [idleImages addObject:image1];
+    [self.header setImages:idleImages forState:MJRefreshStateIdle];
+    
+    [self.header setImages:idleImages forState:MJRefreshStatePulling];
+    
+    // 设置正在刷新状态的动画图片
+    [self.header setImages:idleImages forState:MJRefreshStateRefreshing];
+    
+    // 隐藏时间
+    self.header.lastUpdatedTimeLabel.hidden = YES;
+    
+    // 隐藏状态
+    self.header.stateLabel.hidden = YES;
+    
+    self.dMainTableView.header = self.header;
+    //    [self.header beginRefreshing];
+    // 设置回调（一旦进入刷新状态，就调用target的action，也就是调用self的loadMoreData方法）
+    self.footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+        [self loadData:^(BOOL finish) {
+            [self.footer endRefreshing];
+            if (isEnd == YES) {
+                // 拿到当前的上拉刷新控件，变为没有更多数据的状态
+                [self.dMainTableView.footer noticeNoMoreData];
+                //                [self.footer setState:MJRefreshStateLoadIngEnd];
+                //                self.footer.statusLabel.text = @"内容全部加载完毕";
+            }
+        }];
+    }];
+    // 设置文字
+    [self.footer setTitle:@"下拉加载刷新" forState:MJRefreshStateIdle];
+    [self.footer setTitle:@"加载中 ..." forState:MJRefreshStateRefreshing];
+    [self.footer setTitle:@"全部加载完毕" forState:MJRefreshStateNoMoreData];
+    
+    // 设置字体
+    self.footer.stateLabel.font = [UIFont systemFontOfSize:17];
+    
+    // 设置颜色
+    self.footer.stateLabel.textColor = [UIColor grayColor];
+    
+    self.dMainTableView.footer = self.footer;
+    //    [self.footer beginRefreshing];
+    
+}
+/*
+ **  列表 cell 从头显示
+ */
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([cell respondsToSelector:@selector(setSeparatorInset:)]) {
+        [cell setSeparatorInset:UIEdgeInsetsZero];
+    }
+    if ([cell respondsToSelector:@selector(setLayoutMargins:)]) {
+        [cell setLayoutMargins:UIEdgeInsetsZero];
+    }
+}
+
+#pragma mark -
+- (void)changeNavImg:(NSString *)imgName
+{
+    if (_viewNaviBar) {
+        [_viewNaviBar changeNavImg:imgName];
+    }else{APP_ASSERT_STOP}
+}
+- (void)bringNaviBarToTopmost
+{
+    if (_viewNaviBar)
+    {
+        [self.view bringSubviewToFront:_viewNaviBar];
+    }else{}
+}
+
+- (void)hideNaviBar:(BOOL)bIsHide
+{
+    _viewNaviBar.hidden = bIsHide;
+}
+
+- (void)setNaviBarTitle:(NSString *)strTitle
+{
+    if (_viewNaviBar)
+    {
+        [_viewNaviBar setNavTitle:strTitle];
+    }else{APP_ASSERT_STOP}
+}
+- (void) changeNavTitleColor:(UIColor *)color
+{
+    if (_viewNaviBar)
+    {
+        [_viewNaviBar setNavTitleColor:color];
+    }else{APP_ASSERT_STOP}
+}
+
+- (void)setNaviBarLeftBtn:(DImgButton *)btn
+{
+    if (_viewNaviBar)
+    {
+        [_viewNaviBar setNavLeftBtn:btn];
+    }else{APP_ASSERT_STOP}
+}
+
+- (void)setNaviBarRightBtn:(DImgButton *)btn
+{
+    if (_viewNaviBar)
+    {
+        [_viewNaviBar setNavRightBtn:btn];
+    }else{APP_ASSERT_STOP}
+}
+
+- (void)naviBarAddCoverView:(UIView *)view
+{
+    if (_viewNaviBar && view)
+    {
+        [_viewNaviBar showCoverView:view animation:YES];
+    }else{}
+}
+
+- (void)naviBarAddCoverViewOnTitleView:(UIView *)view
+{
+    if (_viewNaviBar && view)
+    {
+        [_viewNaviBar showCoverViewOnTitleView:view];
+    }else{}
+}
+
+- (void)naviBarRemoveCoverView:(UIView *)view
+{
+    if (_viewNaviBar)
+    {
+        [_viewNaviBar hideCoverView:view];
+    }else{}
+}
+
+// 是否可右滑返回
+- (void)navigationCanDragBack:(BOOL)bCanDragBack
+{
+    if (self.navigationController)
+    {
+        [((DBackNavigationViewController *)(self.navigationController)) navigationCanDragBack:bCanDragBack];
+    }else{}
+}
+
+/*
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
+
+@end

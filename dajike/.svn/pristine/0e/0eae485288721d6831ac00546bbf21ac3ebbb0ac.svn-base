@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>74B83682-DFC6-485E-AB12-1C621A9BAB85</string>
+	<key>IDESourceControlProjectName</key>
+	<string>project</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>a61908f8-2fa9-4b46-84db-7fa9d61100b8++2321</key>
+		<string>svn://192.168.1.130/dajike-ios/trunk/dajike</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>dajike.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>a61908f8-2fa9-4b46-84db-7fa9d61100b8++2321</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectRepositoryRootDictionary</key>
+	<dict>
+		<key>a61908f8-2fa9-4b46-84db-7fa9d61100b8++2321</key>
+		<string>svn://192.168.1.130</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>svn://192.168.1.130/dajike-ios/trunk/dajike/dajike.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>a61908f8-2fa9-4b46-84db-7fa9d61100b8++2321</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.subversion</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>a61908f8-2fa9-4b46-84db-7fa9d61100b8++2321</string>
+			<key>IDESourceControlWCCName</key>
+			<string>dajike</string>
+		</dict>
+	</array>
+</dict>
+</plist>

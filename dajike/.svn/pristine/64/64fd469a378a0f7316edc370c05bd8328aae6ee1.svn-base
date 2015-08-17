@@ -1,0 +1,69 @@
+//
+//  DConfirmOrder1Cell.m
+//  dajike
+//
+//  Created by swb on 15/7/22.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DConfirmOrder1Cell.h"
+#import "dDefine.h"
+
+@implementation DConfirmOrder1Cell
+
+- (void)awakeFromNib {
+    // Initialization code
+    self.lineView1Con.constant = 0.5f;
+    self.lineView2Con.constant = 0.5f;
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+- (void)setGoodsDetailModel:(DGoodsDetailModel *)goodsDetailModel
+{
+    self.storeLb.text = goodsDetailModel.storeName;
+    if (self.yunfei && ![self.yunfei isEqualToString:@"0.00"]) {
+        self.yunfeiLb.text = [NSString stringWithFormat:@"运费：%.2f",[self.yunfei floatValue]];
+    }else
+        self.yunfeiLb.text = @"免运费";
+    
+    CGRect rect1 = [self contentAdaptionLabel:self.yunfeiLb.text withSize:CGSizeMake(500, 20) withTextFont:11.0f];
+    self.yunfeiLbCon.constant = rect1.size.width+5;
+    CGRect rect2 = [self contentAdaptionLabel:self.storeLb.text withSize:CGSizeMake(DWIDTH_CONTROLLER_DEFAULT-90-self.yunfeiLbCon.constant, 20) withTextFont:13.0f];
+    self.storeLbCon.constant = rect2.size.width+5;
+    [self.storeLogoImg setImageWithURL:[commonTools getImgURL:goodsDetailModel.storeLogo] placeholderImage:DPlaceholderImage];
+    self.shifukuanLb.text = [NSString stringWithFormat:@"小计：%.2f",[goodsDetailModel.goodsPrice floatValue]*[self.buyNum intValue]];
+    CGRect rect3 = [self contentAdaptionLabel:self.shifukuanLb.text withSize:CGSizeMake(500, 15) withTextFont:12.0f];
+    self.shifukuanCon.constant = rect3.size.width+5;
+    self.productNumLb.text = [NSString stringWithFormat:@"共%@件",self.buyNum];
+}
+- (void)setDic:(NSMutableDictionary *)dic
+{
+    self.storeLb.text = self.storeName;
+    if (self.yunfei && ![self.yunfei isEqualToString:@"0.00"]) {
+        self.yunfeiLb.text = [NSString stringWithFormat:@"运费：%.2f",[self.yunfei floatValue]];
+    }else
+        self.yunfeiLb.text = @"免运费";
+    CGRect rect1 = [self contentAdaptionLabel:self.yunfeiLb.text withSize:CGSizeMake(500, 20) withTextFont:11.0f];
+    self.yunfeiLbCon.constant = rect1.size.width+5;
+    CGRect rect2 = [self contentAdaptionLabel:self.storeLb.text withSize:CGSizeMake(DWIDTH_CONTROLLER_DEFAULT-90-self.yunfeiLbCon.constant, 20) withTextFont:13.0f];
+    self.storeLbCon.constant = rect2.size.width+5;
+    [self.storeLogoImg setImageWithURL:[commonTools getImgURL:self.storeLogo] placeholderImage:DPlaceholderImage];
+    self.shifukuanLb.text = [NSString stringWithFormat:@"小计：%.2f",[self.xiaoji floatValue]];
+    CGRect rect3 = [self contentAdaptionLabel:self.shifukuanLb.text withSize:CGSizeMake(500, 15) withTextFont:12.0f];
+    self.shifukuanCon.constant = rect3.size.width+5;
+    self.productNumLb.text = [NSString stringWithFormat:@"共%@件",self.buyNum];
+}
+
+- (IBAction)btnClicked:(id)sender {
+    self.blcok();
+}
+- (void)callBack:(CallbackCellClicked)block
+{
+    self.blcok = block;
+}
+@end

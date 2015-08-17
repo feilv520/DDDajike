@@ -1,0 +1,258 @@
+//
+//  SearchViewController.m
+//  jibaobao
+//
+//  Created by dajike on 15/5/15.
+//  Copyright (c) 2015年 dajike. All rights reserved.
+//
+
+#import "SearchViewController.h"
+#import "defines.h"
+#import "JTabBarController.h"
+#import "UIView+MyView.h"
+#import "FoodViewController.h"
+
+
+@interface SearchViewController ()<UITableViewDataSource,UITableViewDelegate,UISearchBarDelegate>
+{
+    UISearchBar *_searchBar;
+    NSMutableArray *titleArr;
+}
+@property(nonatomic, retain) UITableView *tableView;
+
+@end
+
+@implementation SearchViewController
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+        
+        
+    }
+    return self;
+}
+- (void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    //底部tabBar隐藏
+    JTabBarController *jTabBarVC = [JTabBarController sharedManager];
+    [jTabBarVC.tabBarView setHidden:YES];
+    if (_tableView) {
+        [_tableView reloadData];
+    }
+}
+- (void) viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:YES];
+    //底部tabBar展现
+    JTabBarController *jTabBarVC = [JTabBarController sharedManager];
+    [jTabBarVC.tabBarView setHidden:NO];
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [self addTableView];
+    [self addnavItems];
+    [self addHeadView];
+}
+
+- (void) addnavItems
+{
+    UIView *view = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width-65, 44)];
+    view.backgroundColor = [UIColor clearColor];
+    
+    _searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, self.view.frame.size.width-65, 24)];
+    _searchBar.placeholder = @"请输入商家品类地点";
+    _searchBar.layer.borderColor = [Color_gray1 CGColor];
+    _searchBar.layer.borderWidth = 0.5;
+    _searchBar.delegate = self;
+    [view addSubview:_searchBar];
+    
+    UIBarButtonItem *leftItem = [[UIBarButtonItem alloc]initWithCustomView:view];
+    self.navigationItem.leftBarButtonItem = leftItem;
+    
+    UIButton *rightNavButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, 30, 44)];
+    [rightNavButton setTitleColor:Color_mainColor forState:UIControlStateNormal];
+    [rightNavButton setTitle:@"取消" forState:UIControlStateNormal];
+    rightNavButton.backgroundColor = [UIColor clearColor];
+    [rightNavButton.titleLabel setFont:Font_Default];
+    [rightNavButton addTarget:self action:@selector(cancleBUttonClip:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIBarButtonItem *rightButtonItem = [[UIBarButtonItem alloc]initWithCustomView:rightNavButton];
+    self.navigationItem.rightBarButtonItem = rightButtonItem;
+}
+
+- (void) addTableView
+{
+    self.tableView = [[UITableView alloc]initWithFrame:self.view.frame style:UITableViewStyleGrouped];
+    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
+    [self.view addSubview:self.tableView];
+}
+- (void) addHeadView
+{
+    UIView *backView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 160)];
+    backView.backgroundColor = Color_Clear;
+    
+    UILabel *label = [[UILabel alloc] creatLabelWithFrame:CGRectMake(10, 0, 120, 25) AndFont:13 AndBackgroundColor:Color_Clear AndText:@"热门搜索：" AndTextAlignment:NSTextAlignmentLeft AndTextColor:Color_gray4 andCornerRadius:0];
+    [backView addSubview:label];
+    
+    [[MyAfHTTPClient sharedClient]postPathWithMethod:@"GuangGaoHtmls.show" parameters:@{@"code":@"jbb_index_hotSearch"} ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            titleArr = [[NSMutableArray alloc]init];
+            for (NSDictionary *dic in responseObject.result) {
+                NSString *str = [NSString stringWithFormat:@"%@",[dic objectForKey:@"cateName"]];
+                [titleArr addObject:str];
+            }
+            for (int i = 0; i < titleArr.count; i++) {
+                UIButton *btn = [[UIButton alloc] createButtonWithFrame:CGRectMake((i%3)*90+12*((i%3)+1), (i/3)*40+30, 90, 30) andBackImageName:nil andTarget:self andAction:@selector(hostSearchBUttonClip:) andTitle:[titleArr objectAtIndex:i] andTag:i+100];
+                [btn setTitleColor:Color_gray4 forState:UIControlStateNormal];
+                [btn setBackgroundColor:Color_White];
+                btn.layer.cornerRadius = 3;
+                [backView addSubview:btn];
+            }
+            self.tableView.tableHeaderView = backView;
+            
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+    }];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+
+
+//取消
+- (void) cancleBUttonClip:(id) sender
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+//9个热门搜索对应事件
+- (void) hostSearchBUttonClip:(id)sender
+{
+    UIButton *btn = (UIButton *)sender;
+    NSInteger tag= btn.tag-100;
+    //搜索
+//    FoodViewController *searchVC = [[FoodViewController alloc]init];
+//    searchVC.StoreListType = SEARCH;
+//    searchVC.navTitle = [titleArr objectAtIndex:tag];
+//    //这里必须先取值，再写入   因为每次搜索都将最新的搜索值插入数组最前端
+//    [FileOperation writeSearchHistory:[titleArr objectAtIndex:tag]];
+//    [self.navigationController pushViewController:searchVC animated:YES];
+    
+}
+
+
+#pragma mark------
+#pragma mark------uitableViewDelegate uitableViewDatasource--------
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.5;
+}
+//- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+//{
+//    return 0;
+//}
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return [FileOperation getHistoryList].count+1;
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 30;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSInteger row = [indexPath row];
+    
+    static NSString *identifer = @"searchCell";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifer];
+    if (nil == cell) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:identifer];
+    }
+    cell.backgroundColor = Color_Clear;
+    UIView *backView = [[UIView alloc]initWithFrame:CGRectMake(10, 0, self.view.frame.size.width-20, 30)];
+    backView.backgroundColor = Color_White;
+    [cell addSubview:backView];
+    
+    if (row == [FileOperation getHistoryList].count) {
+        UILabel *label = [[UILabel alloc] creatLabelWithFrame:CGRectMake(0, 5, 300, 20) AndFont:13 AndBackgroundColor:Color_Clear AndText:@"清除历史记录" AndTextAlignment:NSTextAlignmentCenter AndTextColor:Color_gray4 andCornerRadius:0];
+        [backView addSubview:label];
+    }else{
+        UIImageView *imageV = [[UIImageView alloc]initWithFrame:CGRectMake(10, 10, 10, 10)];
+        [imageV setImage:[UIImage imageNamed:@"img_re_03"]];
+        [backView addSubview:imageV];
+        
+        UILabel *label = [[UILabel alloc] creatLabelWithFrame:CGRectMake(30, 5, 270, 20) AndFont:13 AndBackgroundColor:Color_Clear AndText:[[FileOperation getHistoryList]objectAtIndex:row] AndTextAlignment:NSTextAlignmentLeft AndTextColor:Color_gray4 andCornerRadius:0];
+        [backView addSubview:label];
+        
+        UIView *line = [[UIView alloc] createViewWithFrame:CGRectMake(0, 29, 300, 0.5) andBackgroundColor:Color_gray4];
+        [backView addSubview:line];
+    }
+ 
+//    backView.layer.cornerRadius = 1.0;
+    
+    return cell;
+}
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    //取消点击选中状态
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    NSInteger row = indexPath.row;
+    if (row == [FileOperation getHistoryList].count) {
+        [FileOperation clearSearchHistory];
+        [tableView reloadData];
+    }else{
+        //搜索
+        FoodViewController *searchVC = [[FoodViewController alloc]init];
+        searchVC.StoreListType = SEARCH;
+        searchVC.navTitle = [[FileOperation getHistoryList]objectAtIndex:row];
+        //这里必须先取值，再写入   因为每次搜索都将最新的搜索值插入数组最前端
+        [FileOperation writeSearchHistory:[[FileOperation getHistoryList]objectAtIndex:row]];
+        [self.navigationController pushViewController:searchVC animated:YES];
+    }
+}
+
+- (void) scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    [_searchBar endEditing:YES];
+}
+
+#pragma mark------
+#pragma mark------uiSearchViewDelegate --------
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    //搜索
+    [FileOperation writeSearchHistory:_searchBar.text];
+    FoodViewController *searchVC = [[FoodViewController alloc]init];
+    searchVC.StoreListType = SEARCH;
+    searchVC.navTitle = _searchBar.text;
+    [self.navigationController pushViewController:searchVC animated:YES];
+    //键盘推出
+    [_searchBar resignFirstResponder];
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

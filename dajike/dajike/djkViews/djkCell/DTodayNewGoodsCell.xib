@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7702" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="gTV-IL-0wX" customClass="DTodayNewGoodsCell">
+            <rect key="frame" x="0.0" y="0.0" width="82" height="93"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="82" height="93"/>
+                <subviews>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="2_03.png" translatesAutoresizingMaskIntoConstraints="NO" id="04s-SX-1SA">
+                        <rect key="frame" x="17" y="8" width="47" height="47"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="04s-SX-1SA" secondAttribute="height" multiplier="1:1" id="Lde-Ep-vHb"/>
+                        </constraints>
+                    </imageView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EBc-Jj-hN0">
+                        <rect key="frame" x="0.0" y="61" width="82" height="21"/>
+                        <constraints>
+                            <constraint firstAttribute="width" secondItem="EBc-Jj-hN0" secondAttribute="height" multiplier="82:21" id="U2W-Wp-Jdg"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            </view>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="EBc-Jj-hN0" secondAttribute="bottom" constant="11" id="GR1-5a-iGw"/>
+                <constraint firstAttribute="trailing" secondItem="04s-SX-1SA" secondAttribute="trailing" constant="18" id="Jly-Jg-zaw"/>
+                <constraint firstItem="EBc-Jj-hN0" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="TFl-n8-vPJ"/>
+                <constraint firstAttribute="trailing" secondItem="EBc-Jj-hN0" secondAttribute="trailing" id="ke9-kd-Rq1"/>
+                <constraint firstItem="04s-SX-1SA" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" constant="8" id="mLD-85-H7r"/>
+                <constraint firstItem="04s-SX-1SA" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="17" id="yQH-N0-CNZ"/>
+            </constraints>
+            <size key="customSize" width="82" height="93"/>
+            <connections>
+                <outlet property="headImageView" destination="04s-SX-1SA" id="9JD-uE-apc"/>
+                <outlet property="titleLabel" destination="EBc-Jj-hN0" id="knb-gw-HoO"/>
+            </connections>
+            <point key="canvasLocation" x="305" y="369.5"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="2_03.png" width="121" height="121"/>
+    </resources>
+</document>

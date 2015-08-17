@@ -1,0 +1,52 @@
+//
+//  DOrderFirstCell.m
+//  dajike
+//
+//  Created by swb on 15/7/16.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DOrderFirstCell.h"
+
+@implementation DOrderFirstCell
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
+- (void)setModel:(OrdersDetailModel *)model
+{
+    switch ([model.status intValue]) {
+        case 0:
+            self.statusLb.text = @"已取消!";
+            break;
+        case 10:
+            self.statusLb.text = @"已支付!";
+            break;
+        case 11:
+            self.statusLb.text = @"待付款!";
+            break;
+        case 20:
+            self.statusLb.text = @"待发货!";
+            break;
+        case 30:
+            self.statusLb.text = @"待收货!";
+            break;
+        case 40:
+            self.statusLb.text = @"交易成功!";
+            break;
+            
+        default:
+            break;
+    }
+    self.allMoneyLb.text = [NSString stringWithFormat:@"订单总额（含运费）：¥%.2f",[model.orderAmount floatValue]];
+    self.yunfeiLb.text = [NSString stringWithFormat:@"运费：¥%.2f",[model.shippingFee floatValue]];
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

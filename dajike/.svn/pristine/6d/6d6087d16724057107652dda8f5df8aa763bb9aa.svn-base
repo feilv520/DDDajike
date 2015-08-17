@@ -1,0 +1,70 @@
+//
+//  DCollectListViewController.m
+//  dajike
+//
+//  Created by songjw on 15/7/16.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DCollectListViewController.h"
+#import "dDefine.h"
+#import "DMyAfHTTPClient.h"
+#import "DBaseNavView.h"
+
+@interface DCollectListViewController (){
+    DImgButton *_leftBut;
+    DImgButton *_rightBut;
+}
+
+@end
+
+@implementation DCollectListViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    if (self.collectType == GOODS) {
+        [self setNaviBarTitle:@"收藏的商品"];
+    }else if (self.collectType == SHOPS){
+        [self setNaviBarTitle:@"收藏的店铺"];
+    }
+//    mine_selected_01完成
+    _leftBut = [DBaseNavView createNavBtnWithImgNormal:@"img_pub_02" imgHighlight:@"" imgSelected:@"mine_selected_02" target:self action:@selector(leftButAciton)];
+    
+    _rightBut = [DBaseNavView createNavBtnWithImgNormal:@"mine_collect_edit" imgHighlight:@"" imgSelected:@"mine_selected_01" target:self action:@selector(rightButAction)];
+    [self setNaviBarLeftBtn:_leftBut];
+    [self setNaviBarRightBtn:_rightBut];
+    
+}
+- (void)leftButAciton{
+}
+- (void)rightButAction{
+    _leftBut.selected = !_leftBut.selected;
+    _rightBut.selected = !_rightBut.selected;
+    if (_leftBut.selected) {
+        [_leftBut setImageEdgeInsets:UIEdgeInsetsMake(5, 15, 5, 15)];
+        [_rightBut setImageEdgeInsets:UIEdgeInsetsMake(5, 15, 5, 15)];
+    }else{
+        [_leftBut setImageEdgeInsets:UIEdgeInsetsMake(10, 15, 10 ,25 )];
+        [_rightBut setImageEdgeInsets:UIEdgeInsetsMake(10, 15, 10, 25)];
+    }
+    
+    
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

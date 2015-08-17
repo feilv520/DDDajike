@@ -1,0 +1,677 @@
+//
+//  FileOperation.m
+//  jibaobao
+//
+//  Created by dajike on 15/5/18.
+//  Copyright (c) 2015年 dajike. All rights reserved.
+//
+
+#import "FileOperation.h"
+//#import "KeychainItemWrapper.h"
+#import "SSKeychain.h"
+#import "defines.h"
+
+#import "FMDatabase.h"
+
+@implementation FileOperation
+//创建plist文件，并获取plist文件路径
++ (NSString *) creatPlistIfNotExist:(NSString *)plistName
+{
+    NSArray *paths=NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *path=[paths    objectAtIndex:0];
+    NSString *name = [NSString stringWithFormat:@"%@.plist",plistName];
+    NSString *filename=[path stringByAppendingPathComponent:name];   //获取路径
+    if (![[NSFileManager defaultManager] fileExistsAtPath:filename]) {
+        NSFileManager* fm = [NSFileManager defaultManager];
+        [fm createFileAtPath:filename contents:nil attributes:nil];
+        
+        
+        NSMutableDictionary *photoPathDic = [[NSMutableDictionary alloc]init];
+        
+        [photoPathDic writeToFile:filename atomically:YES];
+    }
+    //    NSLog(@"path = %@",filename);
+    
+    //cache路径
+    //    NSArray *paths00=NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSAllDomainsMask,YES);
+    //    NSString *path000=[paths00    objectAtIndex:0];
+    //    NSString *path0012 = [NSString stringWithFormat:@"%@Library/Caches",[path000 substringToIndex:path000.length-9]];
+    //     NSLog(@"path000 = %@",paths00);
+    //    NSLog(@"path0012 = %@",path0012);
+    //    NSLog(@"path0012 size = %f",[self folderSizeAtPath:path0012]);
+    //    [self clearCacheAtPath:path0012];
+    //     NSLog(@"path0012 size = %f",[self folderSizeAtPath:path0012]);
+    
+    return filename;
+}
+
++ (void) setPlistObject:(id)object forKey:(NSString *)key ofFilePath:(NSString *)filePath
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithContentsOfFile:filePath];
+    [dic setValue:object forKey:key];
+    [dic writeToFile:filePath atomically:YES];
+}
+
++ (id) getobjectForKey:(NSString *)key ofFilePath:(NSString *)filePath
+{
+    NSMutableDictionary *dic = [NSMutableDictionary dictionaryWithContentsOfFile:filePath];
+    id objc = [dic objectForKey:key];
+    return objc;
+}
+
++ (NSDictionary *)readFileToDictionary:(NSString *)filePath
+{
+    NSArray *paths=NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *path=[paths    objectAtIndex:0];
+    NSString *name = [NSString stringWithFormat:@"%@.plist",filePath];
+    NSString *filename=[path stringByAppendingPathComponent:name];   //获取路径
+    NSDictionary *dic = [NSDictionary dictionaryWithContentsOfFile:filename];
+    return dic;
+}
++ (void)writeToPlistFile:(NSString *)plistName withDic:(NSMutableDictionary *)dic
+{
+    NSArray *keyArr = [dic allKeys];
+    NSMutableDictionary *dicc = [NSMutableDictionary dictionaryWithContentsOfFile:plistName];
+    
+    for (int i=0; i<keyArr.count; i++) {
+        //        NSLog(@"%@=%@",[keyArr objectAtIndex:i],[dic objectForKey:[keyArr objectAtIndex:i]]);
+        if ([dic objectForKey:[keyArr objectAtIndex:i]] == [NSNull null]) {
+            [dicc setObject:@"" forKey:[keyArr objectAtIndex:i]];
+            //            [self setPlistObject:@"" forKey:[keyArr objectAtIndex:i] ofFilePath:plistName];
+        }else
+            [dicc setObject:[NSString stringWithFormat:@"%@",[dic objectForKey:[keyArr objectAtIndex:i]]] forKey:[keyArr objectAtIndex:i]];
+        //            [self setPlistObject:[dic objectForKey:[keyArr objectAtIndex:i]] forKey:[keyArr objectAtIndex:i] ofFilePath:plistName];
+    }
+    [dicc writeToFile:plistName atomically:YES];
+}
+
+//是否在登录状态
++(BOOL) isLogin
+{
+    //当前是否在登录状态
+    NSString *filePAth = [FileOperation creatPlistIfNotExist:SET_PLIST];
+    if ([[FileOperation getobjectForKey:kIsLogin ofFilePath:filePAth] boolValue] == 1) {
+        return YES;
+    }else{
+        return NO;
+    }
+}
+
+//退出登录
++ (void)logOffOrlogOut{
+    [SSKeychain deletePasswordForService:[[NSBundle mainBundle]bundleIdentifier] account:@"userId"];
+    [SSKeychain deletePasswordForService:[[NSBundle mainBundle]bundleIdentifier] account:@"password"];
+    NSString *filePath = [FileOperation creatPlistIfNotExist:SET_PLIST];
+    [FileOperation setPlistObject:@"0" forKey:kIsLogin ofFilePath:filePath];
+    //清空用户信息
+    NSString *filePath0 = [FileOperation creatPlistIfNotExist:jibaobaoUser];
+    NSMutableDictionary *dicc = [NSMutableDictionary dictionaryWithContentsOfFile:filePath0];
+    [dicc removeAllObjects];
+    [FileOperation writeToPlistFile:filePath withDic:dicc];
+    
+}
+
+
+//保存用户密码
++(void) savePassword:(NSString *)password
+{
+    //    KeychainItemWrapper *wrapper = [[KeychainItemWrapper alloc] initWithIdentifier:@"Account Number"
+    //                                                                       accessGroup:@"YOUR_APP_ID_HERE.com.yourcompany.AppIdentifier"];
+    //    //password加密过的，直接保存到钥匙串里，确保安全 明文不安全
+    //
+    //    //保存密码
+    //    [wrapper setObject:password forKey:(__bridge id)kSecValueData];
+    
+    [SSKeychain setPassword:password forService:[[NSBundle mainBundle]bundleIdentifier] account:@"password"];
+}
++(NSString *)getPassword
+{
+    //    KeychainItemWrapper *wrapper = [[KeychainItemWrapper alloc] initWithIdentifier:@"Account Number"
+    //                                                                       accessGroup:@"YOUR_APP_ID_HERE.com.yourcompany.AppIdentifier"];
+    //    //保存帐号
+    //    //userid  获取到的userid是des加密过的，直接保存到钥匙串里，确保安全 明文不安全
+    //    //解密
+    //    NSString *password = [DES3Util decrypt:[wrapper objectForKey:(__bridge id)kSecValueData]] ;
+    
+    NSString *password = [SSKeychain passwordForService:[[NSBundle mainBundle]bundleIdentifier] account:@"password"];
+    password = [DES3Util decrypt:password];
+    return password;
+}
+
+
+//保存用户ID
++(void) saveUserId:(NSString *)userId
+{
+    //    KeychainItemWrapper *wrapper = [[KeychainItemWrapper alloc] initWithIdentifier:@"Account Number"
+    //                                                                       accessGroup:@"YOUR_APP_ID_HERE.com.yourcompany.AppIdentifier"];
+    //    //保存帐号
+    //    //userid  获取到的userid是des加密过的，直接保存到钥匙串里，确保安全 明文不安全
+    //    [wrapper setObject:userId forKey:(__bridge id)kSecAttrAccount];
+    
+    NSLog(@"%@",[DES3Util decrypt:userId]);
+    [SSKeychain setPassword:userId forService:[[NSBundle mainBundle]bundleIdentifier] account:@"userId"];
+    
+}
+
++(NSString *)getUserId
+{
+    //    KeychainItemWrapper *wrapper = [[KeychainItemWrapper alloc] initWithIdentifier:@"Account Number"
+    //                                                                       accessGroup:@"YOUR_APP_ID_HERE.com.yourcompany.AppIdentifier"];
+    //    //保存帐号
+    //    //userid  获取到的userid是des加密过的，直接保存到钥匙串里，确保安全 明文不安全
+    //    //解密
+    //    NSString *userid = [DES3Util decrypt:[wrapper objectForKey:(__bridge id)kSecAttrAccount]] ;
+    
+    NSString *userid = [SSKeychain passwordForService:[[NSBundle mainBundle]bundleIdentifier] account:@"userId"];
+    userid = [DES3Util decrypt:userid];
+    //    userid = [DES3Util decrypt:userid];
+    return userid;
+}
+
+
+
+//获取所有的地区库
++ (void) getAllPlaces:(void (^)(BOOL finish))success
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [paths objectAtIndex:0];
+    NSString *dbPath = [documentDirectory stringByAppendingPathComponent:@"MyDatabase.db"];
+    FMDatabase *db = [FMDatabase databaseWithPath:dbPath] ;
+    if (![db open]) {
+        NSLog(@"Could not open db.");
+        return ;
+    }
+    
+    
+    [db executeUpdate:@"CREATE TABLE IF NOT EXISTS ALLPLACES (id integer  primary key autoincrement,regionId integer, parentId integer, regionName text, pingyinName text)"];
+    
+    //查找最后一条数据
+    FMResultSet *s = [db executeQuery:@"select * from ALLPLACES order by id desc limit 0,1"];
+    NSInteger arrCount = 0;
+    NSString *endRegionId;
+    while ([s next]) {
+        arrCount = [s intForColumn:@"id"];
+        if (arrCount > 0) {
+            endRegionId = [NSString stringWithFormat:@"%d",[s intForColumn:@"regionId"]];
+        }else{
+            endRegionId = @"0";
+        }
+    }
+    if (arrCount == 0) {
+        endRegionId = @"0";
+    }
+    
+    NSDictionary *paramter = @{@"endRegionId":endRegionId,@"regionsCount":[NSString stringWithFormat:@"%ld",(long)arrCount]};
+    [[MyAfHTTPClient sharedClient]postPathWithMethod:@"Regions.regions" parameters:paramter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                NSArray *placeArr = [[NSArray alloc]initWithArray:responseObject.result];
+                for (NSDictionary *cityDic in placeArr) {
+                    
+                    NSString * insertSql = [NSString stringWithFormat:
+                                            @"INSERT INTO ALLPLACES (regionId, parentId, regionName, pingyinName) VALUES ('%ld','%ld','%@','%@')", (long)[[cityDic objectForKey:@"regionId"] integerValue], (long)[[cityDic objectForKey:@"parentId"] integerValue], [NSString stringWithFormat:@"%@",[cityDic objectForKey:@"regionName"]], [NSString stringWithFormat:@"%@",[cityDic objectForKey:@"pingyinName"]]];
+                    [db executeUpdate:insertSql];
+                    
+                }
+                [db close];
+                
+                
+            });
+        }
+        success(YES);
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        success(NO);
+        [db close];
+    }];
+}
+
+
+//取出所有的地区库
++ (NSArray *) getAllPlaces
+{
+    NSMutableArray *placeOriArr = [[NSMutableArray alloc]init];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [paths objectAtIndex:0];
+    NSString *dbPath = [documentDirectory stringByAppendingPathComponent:@"MyDatabase.db"];
+    FMDatabase *db = [FMDatabase databaseWithPath:dbPath] ;
+    if (![db open]) {
+        NSLog(@"Could not open db.");
+        return nil;
+    }
+    
+    [db executeUpdate:@"CREATE TABLE IF NOT EXISTS ALLPLACES (id integer  primary key autoincrement,regionId integer, parentId integer, regionName text, pingyinName text)"];
+    if ([db open]) {
+        FMResultSet *s = [db executeQuery:@"SELECT * FROM ALLPLACES"];
+        NSLog(@"%d",s.columnCount);
+        while ([s next]) {
+            NSMutableDictionary *placeDic = [[NSMutableDictionary alloc]init];
+            [placeDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"regionId"]] forKey:@"regionId"];
+            [placeDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"parentId"]] forKey:@"parentId"];
+            [placeDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"regionName"]] forKey:@"regionName"];
+            [placeDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"pingyinName"]] forKey:@"pingyinName"];
+            [placeOriArr addObject:placeDic];
+        }
+        [db close];
+    }
+    
+    
+    NSLog(@"%@",placeOriArr);
+    
+    
+    //    NSMutableArray *placeOriArr = [NSMutableArray arrayWithArray:[FileOperation getobjectForKey:@"allplace" ofFilePath:[FileOperation creatPlistIfNotExist:plist_AllPlaces]]];
+    return placeOriArr;
+}
+
++ (NSArray *) getAllYijiPlaces
+{
+    NSMutableArray *parentPlaceDic = [[NSMutableArray alloc]init];
+    NSMutableArray *parentPlaceDic1 = [[NSMutableArray alloc]init];
+    NSMutableArray *placeOriArr = [NSMutableArray arrayWithArray:[self getAllPlaces]];
+    for (NSDictionary *dic in placeOriArr) {
+        if ([[dic objectForKey:@"parentId"]integerValue] == 0) {
+            [parentPlaceDic addObject:dic];
+        }
+    }
+    
+    for (int i = 0; i < parentPlaceDic.count; i++) {
+        NSInteger id0 = [[[parentPlaceDic objectAtIndex:i]objectForKey:@"regionId"] integerValue];
+        for (NSDictionary *dic in placeOriArr) {
+            if (([[dic objectForKey:@"parentId"]integerValue] == id0)&&([[dic objectForKey:@"parentId"]integerValue] != 0)) {
+                [parentPlaceDic1 addObject:dic];
+            }
+        }
+    }
+    
+    return parentPlaceDic1;
+}
+
+
+//根据id获取下级地区
++ (NSArray *)getNextPlacesWithRegionId:(NSInteger)regionId
+{
+    NSMutableArray *placeOriArr = [[NSMutableArray alloc]init];
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentDirectory = [paths objectAtIndex:0];
+    NSString *dbPath = [documentDirectory stringByAppendingPathComponent:@"MyDatabase.db"];
+    FMDatabase *db = [FMDatabase databaseWithPath:dbPath] ;
+    if (![db open]) {
+        NSLog(@"Could not open db.");
+        return nil;
+    }
+    
+    [db executeUpdate:@"CREATE TABLE IF NOT EXISTS ALLPLACES (id integer  primary key autoincrement,regionId integer, parentId integer, regionName text, pingyinName text)"];
+    if ([db open]) {
+        NSString *sqlStr = [NSString stringWithFormat:@"SELECT * FROM ALLPLACES WHERE parentId = '%d'",regionId];
+        FMResultSet *s = [db executeQuery:sqlStr];
+        NSLog(@"%d",s.columnCount);
+        while ([s next]) {
+            NSMutableDictionary *placeDic = [[NSMutableDictionary alloc]init];
+            [placeDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"regionId"]] forKey:@"regionId"];
+            [placeDic setObject:[NSString stringWithFormat:@"%d",[s intForColumn:@"parentId"]] forKey:@"parentId"];
+            [placeDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"regionName"]] forKey:@"regionName"];
+            [placeDic setObject:[NSString stringWithFormat:@"%@",[s stringForColumn:@"pingyinName"]] forKey:@"pingyinName"];
+            [placeOriArr addObject:placeDic];
+        }
+        [db close];
+    }
+    return placeOriArr;
+}
+
+//- (NSDictionary *)getLastPlacesWithParentId:(NSInteger)parentId
+//{
+//    NSDictionary *parentDic;
+//    NSMutableArray *placeOriArr = [NSMutableArray arrayWithArray:[FileOperation getobjectForKey:@"allplace" ofFilePath:[FileOperation creatPlistIfNotExist:plist_AllPlaces]]];
+//    for (NSDictionary *dic in placeOriArr) {
+//        if ([[dic objectForKey:@"regionId"] integerValue] == parentId) {
+//            parentDic = [NSDictionary dictionaryWithDictionary:dic];
+//        }
+//    }
+//
+//    return parentDic;
+//}
+
+#pragma mark-------------------
+#pragma mark-----------关于搜索历史纪录的处理------------------------
+//获取本地存储的搜索历史记录
++ (NSArray *) getHistoryList
+{
+    NSMutableArray *marr = [FileOperation getobjectForKey:kSearchHistoryList ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+    //    NSLog(@"marr = %@",marr);
+    return marr;
+}
+
+//清除历史记录
++ (void) clearSearchHistory
+{
+    NSMutableArray *arr = [NSMutableArray arrayWithArray:[self getHistoryList]];
+    [arr removeAllObjects];
+    
+    //修改plist文件里的内容
+    NSMutableDictionary *mdic = [[NSMutableDictionary alloc ]initWithContentsOfFile:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+    [mdic setObject:arr forKey:kSearchHistoryList];
+    [mdic writeToFile:[FileOperation creatPlistIfNotExist:SET_PLIST] atomically:YES];
+    
+    //    self.currentPage =SEARCH;
+}
+//存储历史记录
++ (void) writeSearchHistory:(NSString *)searchKey
+{
+    NSMutableArray *arr = [NSMutableArray arrayWithArray:[self getHistoryList]];
+    
+    for (int j = 0; j< arr.count; j++) {
+        if ([[arr objectAtIndex:j] isEqualToString:searchKey]) {
+            [arr removeObjectAtIndex:j];
+        }
+    }
+    
+    if (arr.count >= 10) {
+        for (int i = 0; i < arr.count-10 + 1; i++) {
+            [arr removeObjectAtIndex:9+i];
+        }
+    }
+    
+    
+    //修改plist文件里的内容
+    [arr insertObject:searchKey atIndex:0];
+    NSMutableDictionary *mdic = [[NSMutableDictionary alloc ]initWithContentsOfFile:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+    [mdic setObject:arr forKey:kSearchHistoryList];
+    [mdic writeToFile:[FileOperation creatPlistIfNotExist:SET_PLIST] atomically:YES];
+}
+
+
+#pragma mark-------------------
+#pragma mark-----------关于最近定位城市--------------------------
+//根据当前城市id获取下级地区
++ (NSArray *)getNextPlacesByCurrentCityId:(NSString *)regionId
+{
+    NSArray *arr = [NSArray arrayWithArray:[self getNextPlacesWithRegionId:[regionId integerValue]]];
+    if (arr.count == 0) {
+        //第一个objc 全城
+        NSDictionary *dic0 = @{@"regionName":@"上海市",@"regionId":[NSString stringWithFormat:@"%@",@"321"]};
+        return @[dic0];
+    }
+    NSMutableArray *mutableArr = [[NSMutableArray alloc]init];
+    NSString *regionName;
+    for (NSDictionary *dic in [self getAllPlaces]) {
+        if ([[dic objectForKey:@"regionId"] integerValue] == [regionId integerValue]) {
+            regionName = [NSString stringWithFormat:@"%@",[dic objectForKey:@"regionName"]];
+        }
+    }
+    //第一个objc 全城
+    NSDictionary *dic0 = @{@"regionName":regionName,@"regionId":[NSString stringWithFormat:@"%@",regionId]};
+    [mutableArr addObject:dic0];
+    for (NSDictionary *dic in arr) {
+        NSMutableDictionary *dic1 = [[NSMutableDictionary alloc]init];
+        [dic1 setObject:[dic objectForKey:@"regionName"] forKey:@"regionName"];
+        [dic1 setObject:[NSString stringWithFormat:@"%@",[dic objectForKey:@"regionId"]] forKey:@"regionId"];
+        [mutableArr addObject:dic1];
+    }
+    return mutableArr;
+}
+//获取最近城市记录
++ (NSArray *)getRecentlyCitys
+{
+    NSMutableArray *marr = [FileOperation getobjectForKey:kRecentlyCityArr ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+    //    NSLog(@"marr = %@",marr);
+    return marr;
+}
+//当前选择城市名称
++ (NSString *)getCurrentCityName
+{
+    NSArray *marr = [self getRecentlyCitys];
+    if (marr == nil) {
+        return @"上海市";
+    }
+    NSDictionary *dic = [NSDictionary dictionaryWithDictionary:[marr objectAtIndex:0]];
+    return [NSString stringWithFormat:@"%@",[dic objectForKey:@"regionName"]];
+}
+//当前选择城市id
++ (NSString *)getCurrentCityId
+{
+    NSArray *marr = [self getRecentlyCitys];
+    if (marr == nil) {
+        //        NSArray *allPlaceArr = [self getAllPlaces];
+        //        for (NSDictionary *dic in allPlaceArr) {
+        //            if ([[dic objectForKey:@"regionName"] isEqualToString:@"上海"]) {
+        //                return [NSString stringWithFormat:@"%@",[dic objectForKey:@"regionId"]];
+        //            }
+        //        }
+        return @"321";
+    }
+    NSDictionary *dic = [NSDictionary dictionaryWithDictionary:[marr objectAtIndex:0]];
+    return [NSString stringWithFormat:@"%@",[dic objectForKey:@"regionId"]];
+}
+//获取定位城市
++(NSString *) getDingweiCityId
+{
+    return (NSString *)[self getobjectForKey:kDingweiCityId ofFilePath:[self creatPlistIfNotExist:SET_PLIST]];
+}
++(NSString *) getDingweiCityName
+{
+    return (NSString *)[self getobjectForKey:kDingweiCityName ofFilePath:[self creatPlistIfNotExist:SET_PLIST]];
+}
+
+//存储当前定位城市
++ (void)writeDingweiCityWithCityName:(NSString *)cityName andCityId:(NSString *)cityId
+{
+    [self setPlistObject:cityId forKey:kDingweiCityId ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+    [self setPlistObject:cityName forKey:kDingweiCityName ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+}
+
+//存储记录
++ (void)writeCurrentCityWithCityName:(NSString *)cityName andCityId:(NSString *)cityId
+{
+    //    @property (retain, nonatomic) NSString *regionId;
+    //    @property (retain, nonatomic) NSString *regionName;
+    NSMutableArray *arr = [NSMutableArray arrayWithArray:[self getRecentlyCitys]];
+    
+    for (int j = 0; j< arr.count; j++) {
+        if ([[[arr objectAtIndex:j] objectForKey:@"regionId"] integerValue] == [cityId integerValue]) {
+            [arr removeObjectAtIndex:j];
+        }
+    }
+    
+    if (arr.count >= 4) {
+        for (int i = 0; i < arr.count-4 + 1; i++) {
+            [arr removeObjectAtIndex:3+i];
+        }
+    }
+    
+    
+    //    //如果为区县  显示上级市名
+    //    NSString *parentName;
+    //    if ([[self getNextPlacesByCurrentCityId:cityId] count] == 1) {
+    //        NSInteger parentId = 0;
+    //        for (NSDictionary *cityDic in [self getAllPlaces]) {
+    //            if ([[cityDic objectForKey:@"regionId"] integerValue] == [cityId integerValue]) {
+    //                parentId = [[cityDic objectForKey:@"parentId"] integerValue];
+    //            }
+    //        }
+    //        for (NSDictionary *cityDic in [self getAllPlaces]) {
+    //            if ([[cityDic objectForKey:@"regionId"] integerValue] == parentId) {
+    //                parentName = [NSString stringWithFormat:@"%@",[cityDic objectForKey:@"regionName"]];
+    //            }
+    //        }
+    //    }
+    //    //修改plist文件里的内容
+    //    if (parentName == nil) {
+    //        //如果
+    //        [arr insertObject:@{@"regionId":cityId,@"regionName":[NSString stringWithFormat:@"%@",cityName]} atIndex:0];
+    //    }else{
+    //       [arr insertObject:@{@"regionId":cityId,@"regionName":[NSString stringWithFormat:@"%@ %@",parentName, cityName]} atIndex:0];
+    //    }
+    [arr insertObject:@{@"regionId":cityId,@"regionName":[NSString stringWithFormat:@"%@",cityName]} atIndex:0];
+    [self setPlistObject:arr forKey:kRecentlyCityArr ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+}
+
+//纪录选择的index
++ (NSInteger) selectIndex
+{
+    NSString *str = [self getobjectForKey:kSelectIndex ofFilePath:[self creatPlistIfNotExist:SET_PLIST]];
+    if (str == nil) {
+        str = @"0";
+    }
+    return [str integerValue];
+}
+
++ (void) writeSelectIndex:(NSInteger) index
+{
+    [self setPlistObject:[NSString stringWithFormat:@"%d",index] forKey:kSelectIndex ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+}
+
+#pragma mark-------------------
+#pragma mark-----------关于缓存的计算和清除--------------------------
+
+//单个文件的大小
++ (long long) fileSizeAtPath:(NSString*) filePath{
+    NSFileManager* manager = [NSFileManager defaultManager];
+    if ([manager fileExistsAtPath:filePath]){
+        return [[manager attributesOfItemAtPath:filePath error:nil] fileSize];
+    }
+    return 0;
+}
+//文件夹大小
++ (float ) folderSizeAtPath:(NSString*) folderPath{
+    NSFileManager* manager = [NSFileManager defaultManager];
+    if (![manager fileExistsAtPath:folderPath]) return 0;
+    NSEnumerator *childFilesEnumerator = [[manager subpathsAtPath:folderPath] objectEnumerator];
+    NSString* fileName;
+    long long folderSize = 0;
+    while ((fileName = [childFilesEnumerator nextObject]) != nil){
+        NSString* fileAbsolutePath = [folderPath stringByAppendingPathComponent:fileName];
+        folderSize += [self fileSizeAtPath:fileAbsolutePath];
+    }
+    return folderSize/(1024.0*1024.0);
+}
+//清除缓存
++(void) clearCacheAtPath:(NSString *)cachePath
+{
+    
+    dispatch_async(
+                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+                   , ^{
+                       
+                       NSArray *files = [[NSFileManager defaultManager] subpathsAtPath:cachePath];
+                       NSLog(@"files :%lu",(unsigned long)[files count]);
+                       for (NSString *p in files) {
+                           NSError *error;
+                           NSString *path = [cachePath stringByAppendingPathComponent:p];
+                           if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+                               [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
+                           }
+                       }
+                       dispatch_async(dispatch_get_main_queue(), ^{
+                           [ProgressHUD showMessage:@"清除成功" Width:100 High:80];
+                       });
+                   });
+    
+    //    NSArray *fileList = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cachePath error:nil];
+    //    for(int i=0;i<[fileList count]; i++)
+    //    {
+    //        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    //        NSString *documentsDirectory = [paths objectAtIndex:0];
+    //        NSString *filePath = [documentsDirectory stringByAppendingPathComponent:[fileList objectAtIndex:i]];
+    //        //NSLog(filePath);
+    //        NSURL *filepaht1=[NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/%@",cachePath,[fileList objectAtIndex:i]]];
+    //
+    //        [[NSFileManager defaultManager] removeItemAtURL:filepaht1 error:nil];
+    //    }
+}
+
+#pragma mark -----------  推送的 deviceToken  --------------------
++(void) writeDeviceToken:(NSString *)deviceToken
+{
+    [self setPlistObject:[NSString stringWithFormat:@"%@",deviceToken] forKey:kDeviceToken ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+}
++ (NSString *) getDeviceToken
+{
+    NSString *str = [NSString stringWithFormat:@"%@",[self getobjectForKey:kDeviceToken ofFilePath:[self creatPlistIfNotExist:SET_PLIST]]];
+    if (str == nil) {
+        str = @"";
+    }
+    if ([str isEqualToString:@"(null)"]) {
+        str = @"";
+    }
+    if ([str isEqual:[NSNull null]] ) {
+        str = @"";
+    }
+    return str;
+    
+}
+#pragma mark -----------  定位的经纬度  --------------------
++(void) writeLatitude:(NSString *)latitude
+{
+    [self setPlistObject:[NSString stringWithFormat:@"%@",latitude] forKey:kLatitude ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+}
++ (NSString *) getLatitude
+{
+    NSString *str = [NSString stringWithFormat:@"%@",[self getobjectForKey:kLatitude ofFilePath:[self creatPlistIfNotExist:SET_PLIST]]];
+    if (str == nil) {
+        str = @"31.326362";
+    }
+    if ([str isEqualToString:@"(null)"]) {
+        str = @"31.326362";
+    }
+    if ([str isEqual:[NSNull null]] ) {
+        str = @"31.326362";
+    }
+    return str;
+}
++(void) writeLongitude:(NSString *)longitude
+{
+    [self setPlistObject:[NSString stringWithFormat:@"%@",longitude] forKey:kLongitude ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+}
++ (NSString *) getLongitude
+{
+    NSString *str = [NSString stringWithFormat:@"%@",[self getobjectForKey:kLongitude ofFilePath:[self creatPlistIfNotExist:SET_PLIST]]];
+    if (str == nil) {
+        str = @"121.442765";
+    }
+    if ([str isEqualToString:@"(null)"]) {
+        str = @"121.442765";
+    }
+    if ([str isEqual:[NSNull null]] ) {
+        str = @"121.442765";
+    }
+    return str;
+}
+
+#pragma mark -----------  消息推送  --------------------
+//写入一条消息
++(void) writeAMessage:(NSDictionary *)messageInfo
+{
+    NSMutableArray *mutableArr = [NSMutableArray arrayWithArray:[self getMessageList]];
+    [mutableArr insertObject:messageInfo atIndex:0];
+    [self setPlistObject:mutableArr forKey:kMessageList ofFilePath:[FileOperation creatPlistIfNotExist:MESSAGE_PLIST]];
+}
+//读取消息列表
++ (NSArray *) getMessageList
+{
+    NSArray *arr = [NSArray arrayWithArray:[self getobjectForKey:kMessageList ofFilePath:[self creatPlistIfNotExist:MESSAGE_PLIST]]];
+    return arr;
+}
+//写入消息个数
++(void) writeMessageNum:(NSInteger)num
+{
+    [self setPlistObject:[NSString stringWithFormat:@"%d",num] forKey:kMessageNumber ofFilePath:[FileOperation creatPlistIfNotExist:MESSAGE_PLIST]];
+}
+//读取消息个数
++ (NSInteger) getMessageNum
+{
+    NSInteger num = [[self getobjectForKey:kMessageNumber ofFilePath:[self creatPlistIfNotExist:MESSAGE_PLIST]] integerValue];
+    return num;
+}
+//清除消息列表
++ (void) clearMessageList
+{
+    NSMutableArray *mutableArr = [NSMutableArray arrayWithArray:[self getMessageList]];
+    [mutableArr removeAllObjects];
+    [self setPlistObject:mutableArr forKey:kMessageList ofFilePath:[FileOperation creatPlistIfNotExist:MESSAGE_PLIST]];
+}
+
+
+
+@end

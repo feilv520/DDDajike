@@ -1,0 +1,13 @@
+//
+//  DGouWuCheGoodsModel.m
+//  dajike
+//
+//  Created by swb on 15/8/3.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DGouWuCheGoodsModel.h"
+
+@implementation DGouWuCheGoodsModel
+
+@end

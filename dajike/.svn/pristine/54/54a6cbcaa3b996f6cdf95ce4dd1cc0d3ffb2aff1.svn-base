@@ -1,0 +1,56 @@
+//
+//  DVerifyPhoneNumViewController.h
+//  dajike
+//
+//  Created by songjw on 15/7/10.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DBackNavigationViewController.h"
+#import "UserInfoModel.h"
+typedef enum{
+    register_verify,
+    boud_verify,
+    quick_login,
+    set_password,
+    set_password_verify,
+    set_password_bound,
+    register_set_password,
+    safe_phone_verify,
+    safe_password_verify,
+    safe_password2_verify,
+    safe_phone_bound,
+    safe_password_bound,
+    safe_password2_bound,
+    safe_phone,
+    safe_password,
+    password2_verify,
+    
+} verifyType;
+
+typedef void(^BackBlock)();
+
+@interface DVerifyPhoneNumViewController : DBackNavigationViewController
+@property (assign, nonatomic) verifyType verigyTape;
+@property (strong, nonatomic) UserInfoModel *userModel;
+
+@property (strong, nonatomic) NSString *phoneNumStr;
+@property (strong, nonatomic) NSString *messageCode;
+
+@property (strong, nonatomic) BackBlock backBlock;
+
+@property (weak, nonatomic) IBOutlet UITextField *phoneTextField;
+@property (weak, nonatomic) IBOutlet UITextField *verifyTextField;
+@property (weak, nonatomic) IBOutlet UIButton *getCodeBut;
+@property (weak, nonatomic) IBOutlet UIButton *verifyBut;
+@property (weak, nonatomic) IBOutlet UIButton *selectBut;
+@property (weak, nonatomic) IBOutlet UIImageView *selectImg;
+@property (weak, nonatomic) IBOutlet UIButton *agreementBut;
+@property (weak, nonatomic) IBOutlet UILabel *meTooLab;
+- (IBAction)butAction:(id)sender;//0 下一步/验证
+- (IBAction)getVerifyCodeAction:(id)sender;
+
+- (void)backToSafetySettingViewController:(BackBlock)block1;
+
+
+@end

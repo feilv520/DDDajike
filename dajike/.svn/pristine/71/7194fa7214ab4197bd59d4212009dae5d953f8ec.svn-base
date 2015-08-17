@@ -1,0 +1,578 @@
+//
+//  DMyCenterViewController.m
+//  dajike
+//
+//  Created by songjw on 15/7/8.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DMyCenterViewController.h"
+#import "dDefine.h"
+#import "NoneLoginCell.h"
+#import "mineMainCell2.h"
+#import "MineNextCell.h"
+#import "mineMainCell3.h"
+#import "DMine11TableViewCell.h"
+#import "DImgButton.h"
+#import "DLoginViewController.h"
+#import "DSettingViewController.h"
+#import "DMessageListViewController.h"
+#import "DMyInformationViewController.h"
+#import "DMyOrderListViewController.h"
+#import "FileOperation.h"
+#import "DMyAfHTTPClient.h"
+#import "AnalysisData.h"
+#import "DTools.h"
+#import "UserInfoModel.h"
+#import "AccountOverViewModel.h"
+#import "DMyFriendListViewController.h"
+
+#import "DMyAddressListAndSafeViewController.h"
+#import "DVerifyPhoneNumViewController.h"
+#import "DMyBankCardListViewController.h"
+#import "DCollectListViewController.h"
+#import "DMyAccountViewController.h"
+#import "DDrawMainViewController.h"
+#import "DGeneralHongBaoViewController.h"
+#import "DMyAccountDetailViewController.h"
+#import "DJiFenViewController.h"
+#import "DHelpViewController.h"
+
+
+@interface DMyCenterViewController ()
+{
+    UIButton *_leftBut;
+    UIButton *_rightBut;
+    UILabel *_midLab;
+    
+    NSMutableDictionary     *_userInfoDic;
+    UserInfoModel           *_userModel;
+    AccountOverViewModel *_accountModel;
+    
+    CGRect _frame;
+}
+
+@end
+
+@implementation DMyCenterViewController
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:NO];
+    if ([FileOperation isLogin]) {
+        _userInfoDic = [[FileOperation readFileToDictionary:dajikeUser]mutableCopy];
+        _userModel = [[UserInfoModel alloc]init];
+        _userModel = [JsonStringTransfer dictionary:_userInfoDic ToModel:_userModel];
+        [self getUerInfo];
+        [self getMyAccountInfo];
+    }
+    [self.dMainTableView reloadData];
+}
+
+- (void)getUerInfo{
+    NSLog(@"%@",[FileOperation getUserId]);
+    NSDictionary *parameter = @{@"userId":[NSString stringWithString:[FileOperation getUserId]]};
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyUserInfos.index" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        NSLog(@"operation = %@",operation);
+        NSLog(@"result:%@",responseObject.result);
+        if (responseObject.succeed) {
+            
+            NSString *jsonStr = [AnalysisData decodeToString:responseObject.result];
+            NSMutableDictionary *userInfoDic = [[JsonStringTransfer jsonStringToDictionary:jsonStr]mutableCopy];
+            NSString *filePath = [FileOperation creatPlistIfNotExist:dajikeUser];
+            [FileOperation writeToPlistFile:filePath withDic:userInfoDic];
+            _userInfoDic = [[FileOperation readFileToDictionary:dajikeUser]mutableCopy];
+            _userModel = [[UserInfoModel alloc]init];
+            _userModel = [JsonStringTransfer dictionary:_userInfoDic ToModel:_userModel];
+            [self getMyAccountInfo];
+
+        }else{
+            
+        }
+        
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+    
+}
+
+
+- (void) getMyAccountInfo{
+    if ([FileOperation getUserId] == nil) {
+        return;
+    }
+    NSDictionary *parameter = @{@"userId":[FileOperation getUserId]};
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyFinances.index" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        NSLog(@"operation:%@\n result:%@",operation,responseObject.result);
+        if (responseObject.succeed) {
+            NSDictionary *dic = [AnalysisData decodeAndDecriptWittDESstring:responseObject.result];
+            _accountModel = [[AccountOverViewModel alloc] init];
+            _accountModel = [JsonStringTransfer dictionary:dic ToModel:_accountModel];
+            
+            [self.dMainTableView reloadData];
+        }
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error:%@",error);
+    }];
+}
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    [self changeNavImg:@"img_mine_clear"];
+    [self setNaviBarTitle:@"我的"];
+    [self.view setBackgroundColor:DColor_f3f3f3];
+    [self.headerView setBackgroundColor:DColor_f3f3f3];
+    
+    [self addTableView:NO];
+    self.dMainTableView.backgroundColor = [UIColor clearColor];
+    self.dMainTableView.layer.borderColor = [[UIColor blueColor] CGColor];
+    [self.view addSubview:self.dMainTableView];
+    
+    CGRect frame = self.dMainTableView.frame;
+    frame.size.height += frame.origin.y;
+    frame.origin.y = 0;
+    self.dMainTableView.frame = frame;
+    self.dMainTableView.separatorColor = UITableViewCellSeparatorStyleNone;
+    self.dMainTableView.showsVerticalScrollIndicator = NO;
+    self.dMainTableView.delegate = self;
+    self.dMainTableView.dataSource = self;
+    self.dMainTableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    [self.dMainTableView reloadData];
+    
+    _midLab = [[UILabel alloc]initWithFrame:CGRectMake((DWIDTH_CONTROLLER_DEFAULT-40)/2, 40, 40, 25)];
+    _midLab.textAlignment = NSTextAlignmentCenter;
+    [DTools setLable:_midLab Font:DFont_Navb titleColor:DColor_ffffff backColor:[UIColor clearColor]];
+    _midLab.text = @"我的";
+    [self.view addSubview:_midLab];
+    
+    _leftBut = [[UIButton alloc]initWithFrame:CGRectMake(20, 40, 25, 25)];
+    _rightBut = [[UIButton alloc]initWithFrame:CGRectMake(DWIDTH_CONTROLLER_DEFAULT - 50, 40, 25, 25)];
+    [_leftBut setImage:[UIImage imageNamed:@"anquan_img_09.png"] forState:UIControlStateNormal];
+    [_rightBut setImage:[UIImage imageNamed:@"anquan_img_10.png"] forState:UIControlStateNormal];
+    [_leftBut addTarget:self action:@selector(navLeftButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [_rightBut addTarget:self action:@selector(navRightButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self.view addSubview:_leftBut];
+    [self.view addSubview:_rightBut];
+    
+    self.loginImg.layer.masksToBounds = YES;
+    self.loginImg.backgroundColor = [UIColor whiteColor];
+    self.loginImg.layer.cornerRadius = 42.0;
+    self.loginImg.layer.borderColor = [[UIColor colorWithRed:212 green:192 blue:161 alpha:1]CGColor];
+    self.loginImg.layer.borderWidth = 2.0;
+    
+    [self.but_1 addTarget:self action:@selector(collectButAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.but_1.tag = 1;
+    [self.but_2 addTarget:self action:@selector(collectButAction:) forControlEvents:UIControlEventTouchUpInside];
+    self.but_2.tag = 2;
+    
+    _frame = self.headerBackImg.frame;
+    _frame.size.width = DWIDTH_CONTROLLER_DEFAULT;
+    self.headerBackImg.frame = _frame;
+    
+}
+- (void)navLeftButtonTapped:(DImgButton *)but{
+    DSettingViewController *settingVC = [[DSettingViewController alloc]init];
+    [self.navigationController pushViewController:settingVC animated:YES];
+}
+- (void)navRightButtonTapped:(DImgButton *)but{
+    DMessageListViewController *messageListVC = [[DMessageListViewController alloc]init];
+    [self.navigationController pushViewController:messageListVC animated:YES];
+}
+
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView{
+    if (scrollView.contentOffset.y < 0) {
+        _leftBut.hidden = NO;
+        _rightBut.hidden = NO;
+        _midLab.hidden = NO;
+        
+        CGRect frame_1 = _frame;
+        frame_1.size.height -= scrollView.contentOffset.y;
+        frame_1.size.width -= frame_1.size.width*scrollView.contentOffset.y/_frame.size.height;
+        frame_1.origin.x += (_frame.size.width -frame_1.size.width)/2;
+        frame_1.origin.y += scrollView.contentOffset.y;
+        self.headerBackImg.frame = frame_1;
+        
+    }else if (scrollView.contentOffset.y > 20){
+        _leftBut.hidden = YES;
+        _rightBut.hidden = YES;
+        _midLab.hidden = YES;
+    }
+    
+}
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 4;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section{
+    if (section == 0) {
+        NSLog(@"height:%f",self.headerView.frame.size.height);
+        return self.headerView.frame.size.height;
+    }else{
+        return 5.0;
+    }
+}
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section{
+    if (section == 0) {
+        
+        [DTools setLable:self.loginLab Font:DFont_12 titleColor:DColor_ffffff backColor:[UIColor clearColor]];
+        [DTools setLable:self.lab_1 Font:DFont_12 titleColor:DColor_ffffff backColor:[UIColor clearColor]];
+        [DTools setLable:self.lab_2 Font:DFont_12 titleColor:DColor_ffffff backColor:[UIColor clearColor]];
+        [DTools setLable:self.nunLab_1 Font:DFont_15 titleColor:DColor_ffffff backColor:[UIColor clearColor]];
+        [DTools setLable:self.numLab_2 Font:DFont_15 titleColor:DColor_ffffff backColor:[UIColor clearColor]];
+        if ([FileOperation isLogin]) {
+            self.loginLab.text = _userModel.nickName;
+            NSURL *imgUrl = [commonTools getImgURL:_userModel.portrait];
+            [self.loginImg setImageWithURL:imgUrl placeholderImage:[UIImage imageNamed:@"nan.png"]];
+            self.nunLab_1.text = _userModel.goodsCount;
+            self.numLab_2.text = _userModel.storeCount;
+            
+        }else{
+            self.loginLab.text = @"点击登录";
+            self.loginImg.image = [UIImage imageNamed:@"nan.png"];
+        }
+        return self.headerView;
+    }
+    return nil;
+}
+
+
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
+    return 0.2; 
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    if (section == 0||section == 1){
+        return 2;
+    }else if (section == 2){
+        return 3;
+    }else{
+        return 4;
+    }
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    UITableViewCell * cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
+    return cell.frame.size.height;
+}
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if (indexPath.section == 0){
+        if (indexPath.row == 1){
+            DMine11TableViewCell *cell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DMine11TableViewCell class]];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+            
+            [cell callBack:^(NSInteger btnTag) {
+                if (btnTag >0 && btnTag < 5) {
+                    if (![FileOperation isLogin]) {
+                        DLoginViewController *vc = [[DLoginViewController alloc]init];
+                        push(vc);
+                        return ;
+                    }
+                }
+                switch (btnTag) {
+                    case 1:{
+                        NSLog(@"待付款");
+                        DMyOrderListViewController *vc = [[DMyOrderListViewController alloc]init];
+                        vc.type = DAI_FU_KUAN;
+                        push(vc);}
+                        break;
+                    case 2:{
+                        NSLog(@"待发货");
+                        DMyOrderListViewController *vc = [[DMyOrderListViewController alloc]init];
+                        vc.type = DAI_FA_HUO;
+                        push(vc);}
+                        break;
+                    case 3:{
+                        NSLog(@"待收货");
+                        DMyOrderListViewController *vc = [[DMyOrderListViewController alloc]init];
+                        vc.type = DAI_SHOU_HUO;
+                        push(vc);}
+                        break;
+                    case 4:{
+                        NSLog(@"待评价");
+                        DMyOrderListViewController *vc = [[DMyOrderListViewController alloc]init];
+                        vc.type = DAI_PING_JIA;
+                        push(vc);}
+                        break;
+                    case 5:{
+                        NSLog(@"帮助");
+                        DHelpViewController *vc = [[DHelpViewController alloc]init];
+                        push(vc);}
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }];
+            return cell;
+        }
+        
+    }else if (indexPath.section == 1){
+        if (indexPath.row == 1){
+            mineMainCell3 *cell = [DTools loadTableViewCell:self.dMainTableView cellClass:[mineMainCell3 class]];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+            [DTools setLable:cell.moneylabel1 Font:DFont_11 titleColor:DColor_808080 backColor:DColor_ffffff];
+            [DTools setLable:cell.moneylabel2 Font:DFont_11 titleColor:DColor_808080 backColor:DColor_ffffff];
+            [DTools setLable:cell.moneylabel3 Font:DFont_11 titleColor:DColor_808080 backColor:DColor_ffffff];
+            [DTools setLable:cell.lab_1 Font:DFont_12 titleColor:DColor_808080 backColor:DColor_ffffff];
+            [DTools setLable:cell.lab_2 Font:DFont_12 titleColor:DColor_808080 backColor:DColor_ffffff];
+            [DTools setLable:cell.lab_3 Font:DFont_12 titleColor:DColor_808080 backColor:DColor_ffffff];
+            
+            [cell.but_1 addTarget:self action:@selector(myAccontButAction:) forControlEvents:UIControlEventTouchUpInside];
+            cell.but_1.tag = 1;
+            [cell.but_2 addTarget:self action:@selector(myAccontButAction:) forControlEvents:UIControlEventTouchUpInside];
+            cell.but_2.tag = 2;
+            [cell.but_3 addTarget:self action:@selector(myAccontButAction:) forControlEvents:UIControlEventTouchUpInside];
+            cell.but_3.tag = 3;
+            if ([FileOperation isLogin]) {
+                cell.accountOverViewModel = _accountModel;
+            }
+            
+            return cell;
+        }
+        
+    }
+    NSString *const cellID = @"gongyong";
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellID];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:cellID];
+        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
+        [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
+
+    }
+    [DTools setLable:cell.textLabel Font:DFont_12 titleColor:DColor_666666 backColor:DColor_ffffff];
+    [DTools setLable:cell.detailTextLabel Font:DFont_11 titleColor:DColor_999999 backColor:DColor_ffffff];
+    UIImage *icon;
+    if (indexPath.section == 0) {
+        if (indexPath.row == 0) {
+            cell.textLabel.text = @"我的订单";
+            cell.detailTextLabel.text = @"查看全部订单";
+            icon = [UIImage imageNamed:@"img_mine_03"];
+        }
+    }
+    if (indexPath.section == 1){
+        if (indexPath.row == 0) {
+            cell.textLabel.text = @"我的账户";
+            cell.detailTextLabel.text = @"";
+            icon = [UIImage imageNamed:@"img_mine_12"];
+        }
+    }
+    if (indexPath.section == 2) {
+        if (indexPath.row == 0) {
+            cell.textLabel.text = @"发红包";
+            cell.detailTextLabel.text = @"";
+            icon = [UIImage imageNamed:@"img_mine_06"];
+            
+        }else if (indexPath.row == 1){
+            cell.textLabel.text = @"积分兑换";
+            cell.detailTextLabel.text = @"";
+            icon = [UIImage imageNamed:@"img_mine_08"];
+            
+        }else if (indexPath.row == 2){
+            cell.textLabel.text = @"我要抽奖";
+            cell.detailTextLabel.text = @"";
+            icon = [UIImage imageNamed:@"img_mine_04"];
+        }
+    }
+    if (indexPath.section == 3) {
+        if (indexPath.row == 0) {
+            cell.textLabel.text = @"我的好友";
+            if ([FileOperation isLogin]) {
+                if (_userModel.friendCount != nil) {
+                    cell.detailTextLabel.text = [NSString stringWithFormat:@"%@个好友",_userModel.friendCount];
+                }else{
+                    cell.detailTextLabel.text = @"0个好友";
+                }
+                
+            }else{
+                cell.detailTextLabel.text = @"";
+            }
+            icon = [UIImage imageNamed:@"img_mine_09"];
+        }else if (indexPath.row == 1){
+            cell.textLabel.text = @"我的银行卡";
+            icon = [UIImage imageNamed:@"img_mine_14"];
+            if ([FileOperation isLogin]) {
+                if ([_userModel.bankCount intValue] > 0) {
+                    cell.detailTextLabel.text = @"已绑定";
+                }else{
+                    cell.detailTextLabel.text = @"未绑定";
+                }
+            }else{
+                cell.detailTextLabel.text = @"";
+            }
+        }else if (indexPath.row == 2){
+            cell.textLabel.text = @"我的手机";
+            icon = [UIImage imageNamed:@"img_mine_07"];
+            if ([FileOperation isLogin]) {
+                if ([_userModel.phoneMobBindStatus intValue] == 1) {
+                    cell.detailTextLabel.text = @"已绑定";
+                }else{
+                    cell.detailTextLabel.text = @"未绑定";
+                }
+            }else{
+                cell.detailTextLabel.text = @"";
+            }
+        }else if (indexPath.row == 3){
+            cell.textLabel.text = @"安全设置";
+            cell.detailTextLabel.text = @"";
+            icon = [UIImage imageNamed:@"img_mine_10"];
+        }
+        
+    }
+    CGSize itemSize = CGSizeMake(25, 25);
+    UIGraphicsBeginImageContextWithOptions(itemSize, NO, 0.0);
+    CGRect imageRect = CGRectMake(0.0, 0.0, itemSize.width, itemSize.height);
+    [icon drawInRect:imageRect];
+    cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return cell;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    if (![FileOperation isLogin]) {
+        DLoginViewController *loginVC = [[DLoginViewController alloc]initWithNibName:@"DLoginViewController" bundle:nil];
+        [self.navigationController pushViewController:loginVC animated:YES];
+        return;
+    }
+    if (indexPath.section == 0) {
+        if (indexPath.row == 0) {//我的订单
+            DMyOrderListViewController *vc = [[DMyOrderListViewController alloc]init];
+            push(vc);
+        }
+    }
+    if (indexPath.section == 1){
+        if (indexPath.row == 0) {//我的账户
+            DMyAccountViewController *accountVC = [[DMyAccountViewController alloc]initWithNibName:nil bundle:nil];
+            if ((_accountModel != nil)&&(_accountModel.yye_yue != nil)) {
+                accountVC.accountModel = _accountModel;
+            }
+            
+            [self.navigationController pushViewController:accountVC animated:YES];
+        }
+    }
+    if (indexPath.section == 2){
+        if (indexPath.row == 0){
+            DGeneralHongBaoViewController *vc = [[DGeneralHongBaoViewController alloc]init];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+        if (indexPath.row == 1) {
+            DJiFenViewController *vc = [[DJiFenViewController alloc]init];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+        if (indexPath.row == 2) {
+            DDrawMainViewController *vc = [[DDrawMainViewController alloc]init];
+            [self.navigationController pushViewController:vc animated:YES];
+        }
+    }
+    if (indexPath.section == 3) {
+        switch (indexPath.row) {
+            case 0:
+                //我的好友
+            {
+                DMyFriendListViewController *vc = [[DMyFriendListViewController alloc]init];
+                vc.userModel = _userModel;
+                [self.navigationController pushViewController:vc animated:YES];
+            }
+            
+                break;
+            case 1:
+                //我的银行卡
+            {
+                DMyBankCardListViewController *vc = [[DMyBankCardListViewController alloc]init];
+                [self.navigationController pushViewController:vc animated:YES];
+            }
+                break;
+            case 2:
+                //我的手机
+            {
+                DVerifyPhoneNumViewController *vc = [[DVerifyPhoneNumViewController alloc]initWithNibName:@"DVerifyPhoneNumViewController" bundle:nil];
+                vc.userModel = _userModel;
+                if ([_userModel.phoneMobBindStatus intValue]==1) {
+                    vc.verigyTape = safe_phone_verify;
+                }else{
+                    vc.verigyTape = safe_phone_bound;
+                }
+                [self.navigationController pushViewController:vc animated:YES];
+            }
+                break;
+            case 3:
+                //安全设计
+            {
+                DMyAddressListAndSafeViewController *vc = [[DMyAddressListAndSafeViewController alloc]init];
+                vc.address_safe = SAFE;
+                [self.navigationController pushViewController:vc animated:YES];
+            }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+- (void)myAccontButAction:(UIButton *)but{
+    if (![FileOperation isLogin]) {
+        DLoginViewController *loginVC = [[DLoginViewController alloc]initWithNibName:@"DLoginViewController" bundle:nil];
+        [self.navigationController pushViewController:loginVC animated:YES];
+        return;
+    }
+    DMyAccountDetailViewController * vc = [[DMyAccountDetailViewController alloc]initWithNibName:nil bundle:nil];
+    if (but.tag == 1) {
+        vc.AccountDetailType = CHONGZHI;
+        vc.totalAccount = _accountModel.chongzhi_jine_index;
+    }else if (but.tag == 2){
+        vc.AccountDetailType = ZHANGHU;
+        vc.totalAccount = _accountModel.shouyi_yue;
+    }else if (but.tag == 3){
+        vc.AccountDetailType = JIFEN;
+        vc.totalAccount = _accountModel.jifen;
+    }
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)collectButAction:(UIButton *)but{
+    if ([FileOperation isLogin]) {
+        DCollectListViewController *vc = [[DCollectListViewController alloc]init];
+        if (but.tag == 1) {
+            vc.collectType = GOODS;
+        }else if (but.tag == 2){
+            vc.collectType = SHOPS;
+        }
+        [self.navigationController pushViewController:vc animated:YES];
+    }else{
+        DLoginViewController *loginVC = [[DLoginViewController alloc]initWithNibName:@"DLoginViewController" bundle:nil];
+        [self.navigationController pushViewController:loginVC animated:YES];
+    }
+    
+}
+
+- (IBAction)DLoginButtonClip:(id)sender{
+    if ([FileOperation isLogin]) {
+        DMyInformationViewController *vc = [[DMyInformationViewController alloc]init];
+        [self.navigationController pushViewController:vc animated:YES];
+    }else{
+        DLoginViewController *loginVC = [[DLoginViewController alloc]initWithNibName:@"DLoginViewController" bundle:nil];
+        [self.navigationController pushViewController:loginVC animated:YES];
+    }
+    
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+    
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

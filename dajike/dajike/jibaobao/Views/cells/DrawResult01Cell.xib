@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7702" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="DrawResult01Cell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="金额" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sAL-YT-g3C">
+                        <rect key="frame" x="0.0" y="1" width="106" height="41"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="类型" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tnh-fw-41Q">
+                        <rect key="frame" x="107" y="1" width="106" height="41"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="中奖时间" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FxD-rU-xyo">
+                        <rect key="frame" x="214" y="1" width="106" height="41"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                </subviews>
+                <color key="backgroundColor" red="0.89534011989999995" green="0.89534011989999995" blue="0.89534011989999995" alpha="1" colorSpace="calibratedRGB"/>
+                <constraints>
+                    <constraint firstAttribute="centerY" secondItem="Tnh-fw-41Q" secondAttribute="centerY" id="Hk9-fN-oaO"/>
+                    <constraint firstItem="FxD-rU-xyo" firstAttribute="leading" secondItem="Tnh-fw-41Q" secondAttribute="trailing" constant="1" id="JjZ-Ar-aij"/>
+                    <constraint firstItem="Tnh-fw-41Q" firstAttribute="width" secondItem="FxD-rU-xyo" secondAttribute="width" id="L3E-tr-AWW"/>
+                    <constraint firstItem="Tnh-fw-41Q" firstAttribute="leading" secondItem="sAL-YT-g3C" secondAttribute="trailing" constant="1" id="LfS-5m-u6Z"/>
+                    <constraint firstItem="Tnh-fw-41Q" firstAttribute="leading" secondItem="sAL-YT-g3C" secondAttribute="trailing" constant="1" id="QYc-zn-Hj1"/>
+                    <constraint firstItem="FxD-rU-xyo" firstAttribute="leading" secondItem="Tnh-fw-41Q" secondAttribute="trailing" constant="1" id="Re1-Gz-ai2"/>
+                    <constraint firstItem="Tnh-fw-41Q" firstAttribute="height" secondItem="FxD-rU-xyo" secondAttribute="height" id="RjR-AS-DSO"/>
+                    <constraint firstAttribute="centerY" secondItem="sAL-YT-g3C" secondAttribute="centerY" id="TXc-Tc-wBm"/>
+                    <constraint firstItem="sAL-YT-g3C" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="1" id="bsw-zj-8Ob"/>
+                    <constraint firstAttribute="trailing" secondItem="FxD-rU-xyo" secondAttribute="trailing" id="jJG-aQ-suH"/>
+                    <constraint firstAttribute="centerY" secondItem="FxD-rU-xyo" secondAttribute="centerY" id="pgV-Rk-lhg"/>
+                    <constraint firstItem="Tnh-fw-41Q" firstAttribute="width" secondItem="sAL-YT-g3C" secondAttribute="width" id="ulv-Tw-hyt"/>
+                    <constraint firstItem="sAL-YT-g3C" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="ygD-Lg-N26"/>
+                    <constraint firstItem="Tnh-fw-41Q" firstAttribute="height" secondItem="sAL-YT-g3C" secondAttribute="height" id="ygV-eA-cZO"/>
+                </constraints>
+            </tableViewCellContentView>
+        </tableViewCell>
+    </objects>
+</document>

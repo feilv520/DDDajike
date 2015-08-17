@@ -1,0 +1,122 @@
+//
+//  DSelectCityView.m
+//  dajike
+//
+//  Created by dajike on 15/7/20.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DSelectCityView.h"
+#import "defines.h"
+#import "UIView+MyView.h"
+#import "DFileOperation.h"
+
+@interface DSelectCityView()
+{
+    NSMutableArray *cityArr;
+}
+@property (retain, nonatomic) UIScrollView *scrollVIew;
+@property (retain, nonatomic) UILabel *cityNameKabel;
+@end
+@implementation DSelectCityView
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        self.backgroundColor = Color_gray1;
+        
+        self.scrollVIew = [[UIScrollView alloc]initWithFrame:CGRectMake(0, 0, WIDTH_CONTROLLER_DEFAULT, 160)];
+        self.scrollVIew.backgroundColor = Color_gray1;
+        [self.scrollVIew setScrollEnabled:YES];
+        [self addSubview:self.scrollVIew];
+        
+        self.cityNameKabel = [[UILabel alloc]
+                              creatLabelWithFrame:CGRectMake(10, 160+10, WIDTH_CONTROLLER_DEFAULT-20, 30) AndFont:14 AndBackgroundColor:Color_White AndText:@"上海" AndTextAlignment:NSTextAlignmentLeft AndTextColor:Color_Black andCornerRadius:2.0];
+        [self addSubview:self.cityNameKabel];
+        
+        UIButton *btn = [[UIButton alloc]createButtonWithFrame:CGRectMake(WIDTH_CONTROLLER_DEFAULT-20-50-20-10, 5+170, 70, 20) andBackImageName:nil andTarget:self andAction:@selector(toBtn:) andTitle:@"切换城市" andTag:0];
+        
+        [btn setTitleColor:Color_mainColor forState:UIControlStateNormal];
+        [self addSubview:btn];
+        
+        UIImageView *imageVIew = [[UIImageView alloc]createImageViewWithFrame:CGRectMake(WIDTH_CONTROLLER_DEFAULT-20-10, 10, 10, 10) andImageName:@"img_arrow_03_right"];
+        [self.cityNameKabel addSubview:imageVIew];
+        self.selectCityTag = 0;
+        [FileOperation getAllPlaces:^(BOOL finish) {
+            
+        }];
+    }
+    
+    return self;
+}
+
+- (void) addSubViewsWithCity:(NSDictionary *)cityDic
+{
+    for (UIView *v in self.scrollVIew.subviews) {
+        [v removeFromSuperview];
+    }
+    NSInteger cityId = [[cityDic objectForKey:@"id"] integerValue];
+    NSArray *cityArr = [DFileOperation getAllQuyuByCityId:cityId];
+    //当前城市所有的区县
+    NSInteger count = cityArr.count;
+    for (int i = 0; i < count; i ++) {
+        UIButton *btn = [[UIButton alloc]createButtonWithFrame:CGRectMake(10+(i%3)*96+(i%3)*6, 8+(i/3)*38, 96, 30) andBackImageName:nil andTarget:self andAction:@selector(toselectQuXian:) andTitle:i == 0?[[cityArr objectAtIndex:i] objectForKey:@"pname"]:[[cityArr objectAtIndex:i] objectForKey:@"name"] andTag:200+i];
+        
+        btn.backgroundColor = Color_White;
+        if (i == self.selectCityTag) {
+            btn.layer.borderColor = [Color_mainColor CGColor];
+            btn.layer.borderWidth = 0.5;
+            [btn setTitleColor:Color_mainColor forState:UIControlStateNormal];
+        }else{
+            btn.layer.borderColor = [Color_White CGColor];
+            btn.layer.borderWidth = 0.5;
+            [btn setTitleColor:Color_Black forState:UIControlStateNormal];
+        }
+        
+        [self.scrollVIew addSubview:btn];
+    }
+    
+    if (count > 12) {
+        [self.scrollVIew setContentSize:CGSizeMake(WIDTH_CONTROLLER_DEFAULT, (count/3+1)*38+8)];
+    }
+
+}
+
+
+- (void) toBtn:(id) sender
+{
+    if (self.myDelegate) {
+        [self.myDelegate  changeCity];
+    }
+}
+
+- (void) toselectQuXian:(id) sender
+{
+    UIButton *btn = (UIButton*) sender;
+    NSInteger count = cityArr.count;
+    for (int i = 0; i < count; i ++) {
+        UIButton *button = (UIButton *)[self viewWithTag:i+200];
+        button.layer.borderColor = [Color_White CGColor];
+        button.layer.borderWidth = 0.5;
+        [button setTitleColor:Color_Black forState:UIControlStateNormal];
+    }
+    
+    btn.layer.borderColor = [Color_mainColor CGColor];
+    btn.layer.borderWidth = 0.5;
+    [btn setTitleColor:Color_mainColor forState:UIControlStateNormal];
+    self.selectCityTag = btn.tag-200;
+    if (self.myDelegate) {
+        [self.myDelegate selectView:self selectedIndex:btn.tag-200];
+    }
+}
+
+/*
+ // Only override drawRect: if you perform custom drawing.
+ // An empty implementation adversely affects performance during animation.
+ - (void)drawRect:(CGRect)rect {
+ // Drawing code
+ }
+ */
+
+@end
+

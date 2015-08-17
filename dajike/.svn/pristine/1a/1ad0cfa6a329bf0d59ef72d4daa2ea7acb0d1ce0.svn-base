@@ -1,0 +1,20 @@
+//
+//  DOrderLastCell.h
+//  dajike
+//
+//  Created by swb on 15/7/16.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+#import "OrdersDetailModel.h"
+
+@interface DOrderLastCell : UITableViewCell
+@property (weak, nonatomic) IBOutlet UILabel *xiadanLb;
+@property (weak, nonatomic) IBOutlet UILabel *fukuan;
+@property (weak, nonatomic) IBOutlet UILabel *fahuoLb;
+@property (weak, nonatomic) IBOutlet UILabel *dingdanbianhaoLb;
+
+@property (strong, nonatomic) OrdersDetailModel *model;
+
+@end

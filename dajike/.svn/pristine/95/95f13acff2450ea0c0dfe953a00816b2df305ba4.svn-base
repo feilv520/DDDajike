@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="7706" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="40" id="KGk-i7-Jjw" customClass="DConfirmOrder2Cell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="40"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="购买数量" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BVk-M0-BXI">
+                        <rect key="frame" x="8" y="11" width="77" height="18"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="77" id="TJg-Eh-f8s"/>
+                            <constraint firstAttribute="height" constant="18" id="jZs-qW-T7I"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" red="0.40000000000000002" green="0.40000000000000002" blue="0.40000000000000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vwV-wz-tT4">
+                        <rect key="frame" x="259" y="10" width="23" height="20"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="20" id="PCP-Ad-fa3"/>
+                            <constraint firstAttribute="width" constant="23" id="Vn2-2s-JGL"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                        <color key="textColor" red="0.50196078430000002" green="0.50196078430000002" blue="0.50196078430000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" tag="2" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qj6-tM-BWk">
+                        <rect key="frame" x="219" y="0.0" width="40" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="40" id="Fji-VB-lUx"/>
+                            <constraint firstAttribute="width" constant="40" id="oDI-gZ-lTx"/>
+                        </constraints>
+                        <state key="normal" image="img_car_06.png">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <connections>
+                            <action selector="btnClicked:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="eDn-aZ-GqV"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Iom-fY-w8M">
+                        <rect key="frame" x="282" y="0.0" width="38" height="40"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="38" id="C8Y-Yh-lKz"/>
+                            <constraint firstAttribute="height" constant="40" id="kYW-mS-j7q"/>
+                        </constraints>
+                        <state key="normal" image="img_car_05.png">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <connections>
+                            <action selector="btnClicked:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="I2a-dc-aRo"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="Iom-fY-w8M" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="D5m-vq-dLL"/>
+                    <constraint firstItem="BVk-M0-BXI" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="11" id="FnM-F2-0ni"/>
+                    <constraint firstItem="vwV-wz-tT4" firstAttribute="leading" secondItem="qj6-tM-BWk" secondAttribute="trailing" id="PmK-Gw-qCI"/>
+                    <constraint firstItem="qj6-tM-BWk" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="cKE-Z7-FQS"/>
+                    <constraint firstItem="BVk-M0-BXI" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="d2I-RT-7XB"/>
+                    <constraint firstAttribute="trailing" secondItem="Iom-fY-w8M" secondAttribute="trailing" id="kQR-wM-Xcl"/>
+                    <constraint firstItem="Iom-fY-w8M" firstAttribute="leading" secondItem="vwV-wz-tT4" secondAttribute="trailing" id="m4e-IG-ViM"/>
+                    <constraint firstItem="vwV-wz-tT4" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="olB-Rj-qJa"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="buyNum" destination="BVk-M0-BXI" id="yDK-8w-9Iy"/>
+                <outlet property="jiaBtn" destination="Iom-fY-w8M" id="01B-Cd-nQt"/>
+                <outlet property="jianBtn" destination="qj6-tM-BWk" id="bcJ-rk-JtE"/>
+                <outlet property="numLb" destination="vwV-wz-tT4" id="OJr-ma-mWu"/>
+            </connections>
+            <point key="canvasLocation" x="65" y="426"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="img_car_05.png" width="50" height="50"/>
+        <image name="img_car_06.png" width="50" height="50"/>
+    </resources>
+</document>

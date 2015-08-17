@@ -1,0 +1,392 @@
+//
+//  DWebViewController.m
+//  dajike
+//
+//  Created by dajike on 15/7/15.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DWebViewController.h"
+#import "dDefine.h"
+#import "defines.h"
+#import "FileOperation.h"
+#import "MethodHead.h"
+#import <JavaScriptCore/JavaScriptCore.h>
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import "DGoodsDetailModel.h"
+#import "DConfirmOrderViewController.h"
+#import "DGouWuCheOperation.h"
+#import "DLoginViewController.h"
+#import "DSJShouYeViewController.h"
+#import "ShareObject.h"
+#import "UMSocialSnsService.h"
+#import "SWBTabBarController.h"
+#import "DTabView.h"
+#import "SWBTabBar.h"
+#import "AccountOverViewModel.h"
+#import "DBaseNavView.h"
+
+@interface DWebViewController ()<UIWebViewDelegate,UMSocialUIDelegate>{
+    UIWebView *_webView;
+    AccountOverViewModel *_accountModel;
+    NSString *_title;
+}
+
+@property (nonatomic,strong,readonly) JSContext *jsContext;
+@end
+
+
+@implementation DWebViewController
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:YES];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    _accountModel = [[AccountOverViewModel alloc]init];
+    if (self.isHelp == 1) {
+        [self setNaviBarTitle:@"帮助中心"];
+        UIWebView *webView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT)];
+        NSURL *url = [NSURL URLWithString:HELP_CENTER];
+        [webView loadRequest:[NSURLRequest requestWithURL:url]];
+        webView.paginationMode = UIWebPaginationModeTopToBottom;
+        //        webView.scalesPageToFit = YES;
+        [self.view addSubview:webView];
+    }
+    if (self.isHelp == 2) {
+        [self setNaviBarTitle:@"关于我们"];
+        UIWebView *webView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT)];
+        NSURL *url = [NSURL URLWithString:ABOUT_US];
+        [webView loadRequest:[NSURLRequest requestWithURL:url]];
+        webView.paginationMode = UIWebPaginationModeTopToBottom;
+        [self.view addSubview:webView];
+    }
+    if (self.isHelp == 3) {
+        [self setNaviBarTitle:@"大集客用户协议公告"];
+        UIWebView *webView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT)];
+        NSURL *url = [NSURL URLWithString:DJK_USER_ARGUMENT];
+        [webView loadRequest:[NSURLRequest requestWithURL:url]];
+        webView.paginationMode = UIWebPaginationModeTopToBottom;
+        [self.view addSubview:webView];
+    }
+    if (self.isHelp == 4) {
+        [self setNaviBarTitle:@"特别声明"];
+        UIWebView *webView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT)];
+        NSURL *url = [NSURL URLWithString:SPECIAL_DECLEAR];
+        [webView loadRequest:[NSURLRequest requestWithURL:url]];
+        webView.paginationMode = UIWebPaginationModeTopToBottom;
+        [self.view addSubview:webView];
+    }
+    if (self.isHelp == 5) {
+        [self setNaviBarTitle:@"抽奖规则"];
+        UIWebView *webView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT)];
+        NSURL *url = [NSURL URLWithString:CHOUJIANG_RULE];
+        [webView loadRequest:[NSURLRequest requestWithURL:url]];
+        webView.paginationMode = UIWebPaginationModeTopToBottom;
+        [self.view addSubview:webView];
+    }
+    if (self.isHelp == 6) {
+        [self setNaviBarTitle:@"商品详情"];
+        _webView = [[UIWebView alloc]initWithFrame:CGRectMake(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT+5)];
+        NSString *urlStr = [NSString stringWithFormat:@"%@%@",GOODS_DETAIL,self.urlStr];
+        NSURL *url = [NSURL URLWithString:urlStr];
+        [_webView loadRequest:[NSURLRequest requestWithURL:url]];
+        _webView.delegate = self;
+        [self.view addSubview:_webView];
+        DImgButton *leftBut = [DBaseNavView createNavBtnWithImgNormal:@"img_pub_02" imgHighlight:@"img_pub_02" imgSelected:@"img_pub_02" target:self action:@selector(navLeftButtonTapped:)];
+        [self setNaviBarLeftBtn:leftBut];
+        
+        DImgButton *searchButton= [DBaseNavView createNavBtnWithImgNormal:@"img_pub_14" imgHighlight:@"img_pub_14" imgSelected:@"img_pub_14" target:self action:@selector(navRightButtonTapped:)];
+        
+        [self setNaviBarRightBtn:searchButton];
+    }
+    if (self.isHelp == 7) {
+        [self setNaviBarTitle:@"查看物流"];
+        UIWebView *webViewiew = [[UIWebView alloc]initWithFrame:CGRectMake(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT+5)];
+        NSString *urlStr = [NSString stringWithFormat:@"%@%@",CHECK_WU_LIU,self.urlStr];
+        NSURL *url = [NSURL URLWithString:urlStr];
+        [webViewiew loadRequest:[NSURLRequest requestWithURL:url]];
+//        webViewiew.delegate = self;
+        [self.view addSubview:webViewiew];
+    }
+    
+    //保存浏览记录
+    if (self.type == IS_NEED_ADD) {
+        [FileOperation addGoodIdToCurrentGoodsIdsArr:self.goodId];
+    }
+    [self getZhangHuYuE];
+}
+//获取账户可用余额
+- (void)getZhangHuYuE
+{
+    if ([commonTools isNull:get_userId]) {
+        return;
+    }
+    NSDictionary *parameter2 = @{@"userId":get_userId};
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyFinances.index" parameters:parameter2 ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        if (responseObject.succeed) {
+            NSLog(@"responseObject.result = %@",responseObject.result);
+            NSDictionary *dic = [AnalysisData decodeAndDecriptWittDESstring:responseObject.result];
+            _accountModel = [JsonStringTransfer dictionary:dic ToModel:_accountModel];
+            [self.dMainTableView reloadData];
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+    }];
+}
+- (void)loginned{
+    NSString *urlStr = nil;
+    if ([FileOperation isLogin]) {
+        urlStr = [NSString stringWithFormat:@"%@%@%@",GOODS_DETAIL,self.urlStr,[FileOperation getUserId]];
+    }else{
+        urlStr = [NSString stringWithFormat:@"%@%@",GOODS_DETAIL,self.urlStr];
+    }
+    NSURL *url = [NSURL URLWithString:urlStr];
+    [_webView loadRequest:[NSURLRequest requestWithURL:url]];
+}
+
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView{
+    int gouwucheNum = 0;
+    if ([FileOperation isLogin]) {
+        
+    }else {
+        gouwucheNum = [DGouWuCheOperation getGouWuCheNum];
+    }
+    [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getCartCount(%d)",gouwucheNum]];
+
+}
+-(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+    
+    NSString *decodeStr=[self decodeString:request.URL.absoluteString];
+    NSRange range = [decodeStr rangeOfString:@"gclist"];
+    if (range.location == NSNotFound) {
+        _title = @"商品详情";
+        [self setNaviBarTitle:@"商品详情"];
+    }else{
+        _title = @"商品评价";
+        [self setNaviBarTitle:@"商品评价"];
+    }
+    // 我要收藏进入登录界面
+    if ([decodeStr hasPrefix:@"http://forios_tologin/"]) {
+        DLoginViewController *vc = [[DLoginViewController alloc]initWithNibName:@"DLoginViewController" bundle:nil];
+        vc.fromVC = GOODSDETAIL;
+        [vc callBack:^{
+            [self loginned];
+        }];
+        push(vc);
+        return NO;
+    }
+    // 进入店铺
+    if ([decodeStr hasPrefix:@"http://forios_gotoshop/"]){
+        NSRange range=[decodeStr rangeOfString:@"http://forios_gotoshop/"];
+        NSString *jsonStr=[decodeStr substringFromIndex:range.length];
+        NSMutableDictionary *dic = [[JsonStringTransfer jsonStringToDictionary:jsonStr]mutableCopy];
+        NSLog(@"%@",dic);
+        DSJShouYeViewController *vc = [[DSJShouYeViewController alloc] init];
+        vc.storeId = [dic objectForKey:@"storeId"];
+        push(vc);
+        return NO;
+    }
+    
+    
+    //加入购物车
+    if ([decodeStr hasPrefix:@"http://forios_jrgwc/"]) {
+        
+        NSRange range=[decodeStr rangeOfString:@"http://forios_jrgwc/"];
+        NSString *jsonStr=[decodeStr substringFromIndex:range.length];
+        NSMutableDictionary *dic = [[JsonStringTransfer jsonStringToDictionary:jsonStr]mutableCopy];
+        NSLog(@"%@",dic);
+        DGoodsDetailModel *model = [[DGoodsDetailModel alloc]init];
+        model = [JsonStringTransfer dictionary:dic ToModel:model];
+        if ([model.stock intValue] <= 0) {
+            showMessage(@"库存不足");
+            return NO;
+        }
+        int gouwuche_num = 0;
+        if ([FileOperation isLogin]) {
+            UInt64 recordTime = [[NSDate date] timeIntervalSince1970]*1000;
+            NSString *time_stamp = [NSString stringWithFormat:@"%llu",recordTime];
+            NSMutableDictionary *mdic = [[NSMutableDictionary alloc]init];
+            NSMutableDictionary *resultDic = [[NSMutableDictionary alloc]init];
+            NSMutableArray *marr = [[NSMutableArray alloc]init];
+            [mdic setObject:model.specId forKey:@"specId"];
+            [mdic setObject:model.number forKey:@"number"];
+            [mdic setObject:time_stamp forKey:@"lastTime"];
+            [marr addObject:mdic];
+            [resultDic setObject:marr forKey:[NSString stringWithFormat:@"%@",model.storeId]];
+            NSDictionary *parameter = [NSDictionary dictionaryWithObjectsAndKeys:get_userId,@"userId",[[JsonStringTransfer objectToJsonString:resultDic] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],@"map", nil];
+            
+            [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"Carts.saveOrGet" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+                NSLog(@"operation6 = %@",operation);
+                
+                if (responseObject.succeed) {
+                    NSLog(@"result = %@",responseObject.result);
+                    NSMutableDictionary * dict = [responseObject.result mutableCopy];
+                    int goodNum = 0;
+                    NSArray *keyArr = [dict allKeys];
+                    for (int i= 0; i<keyArr.count; i++) {
+                        NSMutableArray *arr = [[dict objectForKey:[keyArr objectAtIndex:i]]mutableCopy];
+                        goodNum = goodNum+(int)arr.count;
+                    }
+                    [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getCartCount(%d)",goodNum]];
+                    showMessage(@"加入购物车成功");
+                }else
+                    showMessage(responseObject.msg);
+            } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+                
+            }];
+        }else {
+            [DGouWuCheOperation addIntoGouWuChe:model];
+            gouwuche_num = [DGouWuCheOperation getGouWuCheNum];
+        }
+        [FileOperation setPlistObject:[NSString stringWithFormat:@"%d",gouwuche_num] forKey:@"cartCount" ofFilePath:[FileOperation creatPlistIfNotExist:jibaobaoUser]];
+        [webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"getCartCount(%d)",gouwuche_num]];
+        [[NSNotificationCenter defaultCenter]postNotificationName:@"changeGouWuCheNum" object:nil];
+        return NO;
+    }
+    
+    //立即购买
+    if ([decodeStr hasPrefix:@"http://forios_ljgm/"]) {
+        
+        if ([FileOperation isLogin]) {
+            NSRange range=[decodeStr rangeOfString:@"http://forios_ljgm/"];
+            NSString *jsonStr=[decodeStr substringFromIndex:range.length];
+            NSMutableDictionary *dic = [[JsonStringTransfer jsonStringToDictionary:jsonStr]mutableCopy];
+            DGoodsDetailModel *model = [[DGoodsDetailModel alloc]init];
+            model = [JsonStringTransfer dictionary:dic ToModel:model];
+            if ([model.stock intValue]>0) {
+                DConfirmOrderViewController *vc = [[DConfirmOrderViewController alloc]init];
+                vc.model = model;
+                vc.type = LI_JI_GOU_MAI;
+                push(vc);
+            }else {
+                showMessage(@"库存不足");
+            }
+            
+        }
+        else {
+            DLoginViewController *vc = [[DLoginViewController alloc]init];
+            push(vc);
+        }
+        
+        
+        return NO;
+    }
+     // 购物车
+    if ([decodeStr hasPrefix:@"http://forios_gwc/"]) {
+//        SWBTabBarController *tabbar = [SWBTabBarController sharedManager];
+//        [tabbar setSelectedIndex:2];
+        SWBTabBarController *tabBarVC = [SWBTabBarController sharedManager];
+        tabBarVC.myView.selectView.tabImgView.image = [UIImage imageNamed:@"djk_index_05"];
+        tabBarVC.myView.selectView.tabLb.textColor = DColor_tabbarTextW;
+        tabBarVC.selectedIndex = 2;
+        DTabView *tabV = tabBarVC.myView.subviews[2];
+        tabV.tabImgView.image = [UIImage imageNamed:@"djk_index_06"];
+        tabV.tabLb.textColor = DColor_c4291f;
+        tabBarVC.myView.selectView = tabV;
+        return NO;
+    }
+    
+    //立即兑换
+    if ([decodeStr hasPrefix:@"http://forios_ljdh/"]) {
+        if ([FileOperation isLogin]) {
+            NSRange range=[decodeStr rangeOfString:@"http://forios_ljdh/"];
+            NSString *jsonStr=[decodeStr substringFromIndex:range.length];
+            NSMutableDictionary *dic = [[JsonStringTransfer jsonStringToDictionary:jsonStr]mutableCopy];
+            DGoodsDetailModel *model = [[DGoodsDetailModel alloc]init];
+            model = [JsonStringTransfer dictionary:dic ToModel:model];
+            if ([model.ifJifen intValue] > [_accountModel.jifen intValue]) {
+                NSString *str = [NSString stringWithFormat:@"您的积分为%@，所需兑换积分为%@",_accountModel.jifen,model.ifJifen];
+                showMessage(str);
+            }else {
+                DConfirmOrderViewController *vc = [[DConfirmOrderViewController alloc]init];
+                vc.model = model;
+                vc.type = LI_JI_DUI_HUAN;
+                push(vc);
+            }
+        }
+        else {
+            DLoginViewController *vc = [[DLoginViewController alloc]init];
+            push(vc);
+        }
+        
+        
+        return NO;
+    }
+    
+    return YES;
+}
+
+
+-(NSString *)decodeString:(NSString*)encodedString
+
+{
+    NSString *decodedString  = (__bridge_transfer NSString *)CFURLCreateStringByReplacingPercentEscapesUsingEncoding(NULL,
+                                                                                                                     (__bridge CFStringRef)encodedString,
+                                                                                                                     CFSTR(""),
+                                                                                                                     CFStringConvertNSStringEncodingToEncoding(NSUTF8StringEncoding));
+    return decodedString;
+}
+//- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType{
+//    if (navigationType == UIWebViewNavigationTypeLinkClicked) {
+//        NSLog(@"klsjdkf ");
+//    }
+//    return YES;
+//}
+//
+//- (void)webViewDidFinishLoad:(UIWebView *)webView{
+//    if (_jsContext == nil) {
+//        _jsContext.exceptionHandler = ^(JSContext *context, JSValue *exceptionValue){
+//            context.exception = exceptionValue;
+////            DDLogVerbose(@"error:%@",exceptionValue);
+//        };
+//    }
+//}
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error{
+    
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void) navRightButtonTapped:(id) sender
+{
+    //是否已经登陆，如果已经登陆，userId也分享出去
+    NSString *userIdStr = [self.urlStr substringFromIndex:7];
+//    if ([FileOperation isLogin]) {
+//        userIdStr = [NSString stringWithFormat:@"%@?u_id=%@",@"",[FileOperation getUserId]];
+//    }else{
+//        userIdStr = @"71954";
+//    }
+    //分享
+    [[ShareObject shared] setShareImage:[UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:self.imageUrl]]] andShareTitle:self.googsTitle andShareUrl:[NSString stringWithFormat:@"http://weixin1.dajike.com/goods/pshow/%@",userIdStr]];
+    [[ShareObject shared]shareUM:@"sd" presentSnsIconSheetView:self delegate:self];
+}
+- (void)navLeftButtonTapped:(id) sender{
+    if ([_title isEqualToString:@"商品详情"]){
+        [self.navigationController popViewControllerAnimated:YES];
+    }else if ([_title isEqualToString:@"商品评价"]){
+        NSString *urlStr = [NSString stringWithFormat:@"%@%@",GOODS_DETAIL,self.urlStr];
+        NSURL *url = [NSURL URLWithString:urlStr];
+        [_webView loadRequest:[NSURLRequest requestWithURL:url]];
+    }
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

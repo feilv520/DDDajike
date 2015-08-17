@@ -1,0 +1,117 @@
+//
+//  DFindPassword0ViewController.m
+//  dajike
+//
+//  Created by songjw on 15/7/10.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DFindPassword0ViewController.h"
+#import "DFindPasswordViewController.h"
+#import "dDefine.h"
+#import "DTools.h"
+#import "MBProgressHUD+Add.h"
+#import "DMyAfHTTPClient.h"
+#import "AnalysisData.h"
+#import "UserInfoModel.h"
+
+
+@interface DFindPassword0ViewController ()
+
+@end
+
+@implementation DFindPassword0ViewController
+- (void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:YES];
+    [self.codeView change];
+    self.codeLab.text = self.codeView.changeString;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    [self.view setBackgroundColor:DColor_f3f3f3];
+    [DTools setTextfield:self.phoneTextField Font:DFont_13 titleColor:DColor_cccccc backColor:DColor_ffffff];
+    [DTools setTextfield:self.verifyTextField Font:DFont_13 titleColor:DColor_cccccc backColor:DColor_ffffff];
+    [DTools setLable:self.codeLab Font:DFont_13 titleColor:DColor_c4291f backColor:DColor_ffffff];
+    [DTools setButtton:self.changeBut Font:DFont_13 titleColor:DColor_808080 backColor:DColor_ffffff];
+    [DTools setButtton:self.nextBut Font:DFont_13 titleColor:DColor_ffffff backColor:DColor_c4291f];
+
+    self.phoneTextField.layer.borderWidth = 0.5;
+    self.phoneTextField.layer.borderColor = [[UIColor grayColor] CGColor];
+    self.verifyTextField.layer.borderWidth = 0.5;
+    self.verifyTextField.layer.borderColor = [[UIColor grayColor] CGColor];
+    [self setNaviBarTitle:@"找回密码"];
+    self.codeView.layer.borderWidth = 0.5;
+    self.codeView.layer.borderColor = [[UIColor grayColor] CGColor];
+    
+}
+
+- (IBAction)buttonAction:(id)sender {
+    UIButton *but = (UIButton *)sender;
+    if (but.tag == 0) {
+        [self.codeView change];
+        self.codeLab.text = self.codeView.changeString;
+
+    }else if (but.tag == 1) {
+        if ([self.phoneTextField.text isEqualToString:@""]) {
+            [MBProgressHUD show:@"请您填写用户名/邮箱/手机号!" icon:nil view:self.view afterDelay:0.7];
+            
+        }else if ([self.verifyTextField.text isEqualToString:self.codeView.changeString]||
+                  [self.verifyTextField.text isEqualToString:self.codeView.codeString]){
+            
+            [self findByUserName];
+            
+        }else{
+            [MBProgressHUD show:@"请您填写正确的验证码!" icon:nil view:self.view afterDelay:0.7];
+        }
+    }
+}
+
+- (void)findByUserName{
+    NSDictionary *parameter = [NSDictionary dictionaryWithObjectsAndKeys:self.phoneTextField.text,@"userName",nil];
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyAccounts.findByUserName" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        NSLog(@"operation6 = %@",operation);
+        NSLog(@"result = %@",responseObject.result);
+        if (responseObject.succeed) {
+            
+            NSDictionary *resultDic = [AnalysisData decodeAndDecriptWittDESstring:responseObject.result];
+            UserInfoModel *model = [[UserInfoModel alloc]init];
+            model = [JsonStringTransfer dictionary:resultDic ToModel:model];
+            
+            DFindPasswordViewController *FindPasswordVC = [[DFindPasswordViewController alloc]initWithNibName:nil bundle:nil];
+            FindPasswordVC.userInfoModel = model;
+            [self.navigationController pushViewController:FindPasswordVC animated:YES];
+            
+        }else{
+            [MBProgressHUD show:responseObject.msg icon:nil view:self.view afterDelay:0.7];
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error:%@",error);
+    }];
+}
+
+
+
+
+
+
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+
+@end

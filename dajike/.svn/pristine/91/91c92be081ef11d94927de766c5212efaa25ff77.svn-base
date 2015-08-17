@@ -1,0 +1,182 @@
+//
+//  MethodHead.m
+//  jibaobao
+//
+//  Created by dajike on 15/5/29.
+//  Copyright (c) 2015年 dajike. All rights reserved.
+//
+
+#import "MethodHead.h"
+
+//分享｀跳转链接
+NSString* const  SHARE_URL = @"https://itunes.apple.com/us/app/ji-bao-bao/id996401785?l=zh&ls=1&mt=8";
+//NSString* const  SHARE_URL = @"https://itunes.apple.com/cn/app/ji-bao-bao/id996401785?l=en&mt=8";
+/*
+//帮助中心
+NSString* const  HELP_CENTER = @"http://weixin1.mandi.net.cn/jbbs/center";
+//关于我们
+NSString* const  ABOUT_US = @"http://weixin1.mandi.net.cn/jbbs/about";
+//大集客用户协议公告
+NSString* const DJK_USER_ARGUMENT = @"http://weixin1.mandi.net.cn/jbbs/notice";
+//抽奖规则
+NSString* const CHOUJIANG_RULE = @"http://weixin1.mandi.net.cn/jbbs/choujiangRule";
+//特别声明
+NSString* const SPECIAL_DECLEAR = @"http://weixin1.mandi.net.cn/jbbs/shenming";
+*/
+
+
+//帮助中心
+NSString* const  HELP_CENTER = @"http://app.dajike.com/jbbs/center";
+//关于我们
+NSString* const  ABOUT_US = @"http://app.dajike.com/jbbs/about";
+//大集客用户协议公告
+NSString* const DJK_USER_ARGUMENT = @"http://app.dajike.com/jbbs/notice";
+//抽奖规则
+NSString* const CHOUJIANG_RULE = @"http://app.dajike.com/jbbs/choujiangRule";
+//特别声明
+NSString* const SPECIAL_DECLEAR = @"http://app.dajike.com/jbbs/shenming";
+//商家详情
+NSString* const GOODS_DETAIL = @"http://app.mandi.net.cn/Djks/gshow";
+
+
+
+
+NSString* const  METHOD_HELP_ADD_FEEDBACK = @"help_add_feedback";             //eg
+//------------------------------------------------
+//--------------首页---------------------------------
+NSString* const  GUANGGAO_HTMLS_SHOW = @"GuangGaoHtmls.show";                 //广告
+NSString* const  GUANGGAO_HTMLS_FUJINYOUHUI = @"GuangGaoHtmls.fujinyouhui";   //首页广告（附近优惠）
+//NSString* const  STORES_HOMESEARCH = @"Stores.homeSearch";                  //首页搜索
+//------------------------------------------------
+//--------------附近---------------------------------
+NSString* const  STORE_LIST = @"Stores.list";                                 //商家列表
+
+//------------------------------------------------
+//--------------美食---------------------------------
+NSString* const  STORE_SHOW_BASIC = @"Stores.show_Basic";                     //商家详情--基本信息
+NSString* const  CONFIGS_SORTFIELDS = @"Configs.sortFields";                  //排序字段
+
+//------------------------------------------------
+//--------------休闲娱乐---------------------------------
+
+
+
+//------------------------------------------------
+//--------------购物---------------------------------
+NSString* const  SHOPPINGS_INDEX = @"Shoppings.index";                        //首页
+NSString* const  GOODS_LIST = @"Goods.list";//商品列表
+NSString* const  GOODS_GOODSDETAIL = @"Goods.goodsDetail";                    //商品详情--基本信息
+NSString* const  GOODS_GOODSPHOTOS = @"Goods.goodsPhotos";                    //商品相册
+NSString* const  GOODS_COMMENTS = @"Goods.comments";                          //商品评论
+NSString* const  GOODS_GOODSCATEGORY = @"Goods.goodsCategory";                //商品分类
+NSString* const  ORDERS_CREATEORDER = @"Orders.createOrder";                  //创建订单
+
+//------------------------------------------------
+//--------------我的---------------------------------
+//**************我的设置***********************
+//NSString* const  MYSETTINGS_INDEX = @"MySettings.index";
+
+//**************个人资料***********************
+NSString* const  MYUSERINFOS_INDEX = @"MyUserInfos.index";
+NSString* const  MYUSERINFOS_UPDATENICKNAME = @"MyUserInfos.updateNickName";  //修改昵称
+NSString* const  MYUSERINFOS_UPDATEGENDER = @"MyUserInfos.updateGender";      //修改性别
+NSString* const  MYUSERINFOS_BINDMOBILEPHONE = @"MyUserInfos.bindMobilePhone";//绑定手机
+NSString* const  MYUSERINFOS_UPDATEPASSWORD = @"MyUserInfos.updatePassword";  //修改密码
+NSString* const  MYUSERINFOS_UPDATEPASSWORD2 = @"MyUserInfos.updatePassword2";//修改支付密码
+NSString* const  MYUSERINFOS_COUNTCOUPONS = @"MyUserInfos.countCoupons";      //我的优惠券总数
+NSString* const  MYUSERINFOS_COUNTCOLLECTS = @"MyUserInfos.countCollects";    //我的收藏总数
+
+//**************我的账户***********************
+NSString* const  MYFINANCES_INDEX = @"MyFinances.index";                      //账户概览
+NSString* const  MYFINANCES_SHOUYI = @"MyFinances.shouYi";                    //收益账户明细列表
+NSString* const  MYFINANCES_CHONGZHI = @"MyFinances.chongZhi";                //充值账户明细列表
+NSString* const  MYFINANCES_JIFEN = @"MyFinances.jiFen";                      //积分明细列表
+NSString* const  MYFINANCES_YINGYEE = @"MyFinances.yingYeE";                  //营业额户明细列表
+NSString* const  MYFINANCES_JIANGLISHOUYI = @"MyFinances.jiangLiShouYi";      //奖励收益明细列表
+NSString* const  MYFINANCES_CHOUJIANGSHOUYI = @"MyFinances.chouJiangShouYi";  //抽奖收益明细列表
+NSString* const  MYBANKS_TIXIAN = @"MyBanks.tixian";                          //转账
+
+//**************我的收藏***********************
+NSString* const  MYCOLLECTSS_COUPONLIST = @"MyCollectss.couponList";          //收藏的优惠券列表
+NSString* const  MYCOLLECTSS_STORELIST = @"MyCollectss.storeList";            //收藏的商家列表
+NSString* const  MYCOLLECTSS_DELETE = @" MyCollectss.delete";                 //删除我的收藏
+
+//**************我的订单***********************
+NSString* const  MYORDERS_AJAXLIST = @"MyOrders.ajaxList";                    //分页查询订单
+NSString* const  MYORDERS_DETAIL = @"MyOrders.detail";                        //订单详情
+NSString* const  MYORDERS_EVALUATE = @"MyOrders.evaluate";                    //评价订单
+NSString* const  MYORDERS_CREATEORDER = @"MyOrders.createOrder";              //创建订单
+
+//**************我的优惠券***********************
+NSString* const  MYCOUPONS_LIST = @"MyCoupons.list";                          //优惠券列表
+NSString* const  MYCOUPONS_DETAOL = @"MyCoupons.detail";                      //优惠券详情
+
+//**************我的账号***********************
+NSString* const  MYACCOUNTS_LOGIN = @"MyAccounts.login";                      //登陆
+NSString* const  MYACCOUNTS_FASTLOGIN = @"MyAccounts.fastlogin";              //无密码手机快速登录
+NSString* const  MYACCOUNTS_QQLOGIN = @"MyAccounts.qqLogin";                  //QQ账号登陆
+NSString* const  MYACCOUNTS_WEIXINLOGIN = @"MyAccounts.weixinLogin";          //微信账号登陆
+NSString* const  MYACCOUNTS_REGISTRY = @"MyAccounts.registry";                //注册
+NSString* const  MYACCOUNTS_SETPASSWORD2 = @"MyAccounts.setPassword2";        //设置支付密码
+NSString* const  MYACCOUNTS_FINDPASSWORDVALIDATE = @"MyAccounts.findPasswordValidate";//找回密码， 验证短信
+
+//**************我的收货地址***********************
+NSString* const  MYADDRESS_LIST = @"MyAddress.list";                          //地址列表
+NSString* const  MYADDRESS_UPDATE = @"MyAddress.update";                      //编辑收货地址
+NSString* const  MYADDRESS_CREATE = @"MyAddress.create";                      //创建收货地址
+NSString* const  MYADDRESS_DELETE = @"MyAddress.delete";                      //删除收货地址
+NSString* const  MYADDRESS_SAVEDEFAULT = @"MyAddress.saveDefault";            //设置默认收货地址
+
+//**************我的银行卡***********************
+NSString* const  MYBANKS_LIST = @"MyBanks.list";                              //绑定银行卡列表
+NSString* const  MYBANKS_CREATE = @"MyBanks.create";                          //绑定银行卡
+NSString* const  MYBANKS_DELETE = @"MyBanks.delete";                          //解绑银行卡
+NSString* const  MYBANKS_SAVE = @"MyBanks.save";                              //修改银行卡
+NSString* const  MYBANKS_SHOW = @"MyBanks.show";                              //展示单个银行卡
+NSString* const  MYBANKS_SAVEDEFAULT = @"MyBanks.saveDefault";                //设置默认银行卡
+NSString* const  MYBANKS_CHANNELLIST = @"MyBanks.ChannelList";                //银行卡类型列表
+//NSString* const  MYBANKS_TIXIAN = @"MyBanks.tixian";                        //提现申请
+
+//**************开单、优惠券验证***********************
+NSString* const  MYKAIDANS_CREATE = @"MyKaiDans.create";                      //开单
+NSString* const  MYKAIDANS_KAIDANLIST = @" MyKaiDans.kaiDanList";             //开单记录列表
+NSString* const  MYKAIDANS_VALIDATECOUPONCODE = @"MyKaiDans.validateCouponCode";//已验证的优惠券的列表
+
+//------------------------------------------------
+//--------------抽奖---------------------------------
+//NSString* const  CHOUJIANGS_INDEX = @"ChouJiangs.index";                    //抽奖首页
+//NSString* const  CHOUJIANGS_RULES = @"ChouJiangs.rules";                    //抽奖规则
+//NSString* const  CHOUJIANGS_QUERY = @"ChouJiangs.query";                    //奖金查询
+
+//------------------------------------------------
+//--------------商家类(Stores)---------------------------------
+NSString* const  STORES_ALLCATEGORYLISTS = @"Stores.allCategoryLists";        //商家列表—商家分类
+NSString* const  STORES_DETAIL = @"Stores.detail";                            //商家详情—基本信息
+NSString* const  STORES_PHOTO = @"Stores.photo";                              //商家详情—商家相册
+NSString* const  STORES_COUPON = @"Stores.coupon";                            //商家详情—代金券
+NSString* const  STORES_STORETUIJIAN = @"Stores.storeTuiJian";                //商家详情—推荐商品
+NSString* const  STORES_COMMENTS = @"Stores.comments";                        //商家详情—商家评论
+//NSString* const  STORES_FJLIST = @"Stores.fjList";                          //附近商家
+
+//------------------------------------------------
+//-------------商品类(Goods)---------------------------------
+NSString* const  GOODS_COUPONDETAIL = @"Goods.couponDetail";                  //代金券详情-基本信息
+NSString* const  GOODS_RECOMDGOODS = @"Goods.recomdGoods";                    //代金券详情-推荐商品
+
+//------------------------------------------------
+//--------------收货地址类(Addresss)---------------------------------
+NSString* const  ADDRESS_LIST = @"Addresss.list";                             //地址列表
+
+//------------------------------------------------
+//--------------发送消息类(Sends)---------------------------------
+NSString* const  SENDS_SMS = @"Sends.sms";                                    //发送手机短信
+NSString* const  SENDS_EMAIL = @"Sends.email";                                //发送邮件
+//NSString* const  SENDS_MESSAGE = @"Sends.message";                          //推送消息
+
+//------------------------------------------------
+//--------------配置类(Configs)---------------------------------
+NSString* const  CONFIGS_DOMAIN = @"Configs.domain";                          //域名配置
+
+@implementation MethodHead
+
+@end

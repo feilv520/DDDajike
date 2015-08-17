@@ -1,0 +1,393 @@
+//
+//  DTuijianGoogsViewController.m
+//  dajike
+//
+//  Created by dajike on 15/7/17.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DTuijianGoogsViewController.h"
+#import "DZiyingCell.h"
+#import "DGoodsListTableViewCell.h"
+#import "dDefine.h"
+//model
+#import "DReXiaoGoodsModel.h"
+#import "DZiyingCateModel.h"
+//controller
+#import "DWebViewController.h"
+
+#import "DGoodsListViewController.h"
+
+
+@interface DTuijianGoogsViewController ()
+{
+    NSMutableArray *tuijianArr;
+    NSInteger page;
+    NSMutableArray *ziyingArr;
+    BOOL isFirst;
+}
+@end
+
+@implementation DTuijianGoogsViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    isFirst = YES;
+    // Do any additional setup after loading the view.
+    self.mainTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT-64-30) style:UITableViewStyleGrouped];
+    self.mainTableView.backgroundColor = DColor_f6f1ef;
+    self.mainTableView.delegate = self;
+    self.mainTableView.dataSource = self;
+    [self.view addSubview:self.mainTableView];
+    
+    //添加无数据时的显示界面，正常情况下隐藏
+    self.noDataView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"loading_no_s"]];
+    self.noDataView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.noDataView setFrame:CGRectMake(0, 0, self.mainTableView.frame.size.width, self.mainTableView.frame.size.height)];
+    [self.mainTableView addSubview:self.noDataView];
+    [self.noDataView setHidden:YES];
+    
+    //  列表 cell 从头开始显示  需要实现一个代理方法
+    if ([self.mainTableView respondsToSelector:@selector(setSeparatorInset:)]) {
+        [self.mainTableView setSeparatorInset:UIEdgeInsetsZero];
+    }
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 80000
+    if ([self.mainTableView respondsToSelector:@selector(setLayoutMargins:)]) {
+        [self.mainTableView setLayoutMargins:UIEdgeInsetsZero];
+    }
+#endif
+    
+    
+    if (_isTuijian) {
+        if ((tuijianArr != nil)&&(tuijianArr.count > 0)) {
+            [tuijianArr removeAllObjects];
+            tuijianArr = nil;
+        }
+        tuijianArr = [[NSMutableArray alloc]init];
+        isEnd = NO;
+        page = 0;
+        [self loadZiyingTuijian:^(BOOL finish) {
+        }];
+        [self addHeaderAndFooter];
+    }
+    else{
+        //手机数码  类别
+//        [self getCateList];
+    }
+}
+
+- (void) viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:YES];
+    NSLog(@"sfdfd");
+    if (!_isTuijian) {
+        //手机数码  类别
+        [self getCateList];
+    }
+}
+- (void) viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:YES];
+    NSLog(@"sfdfd  viewDidAppear");
+}
+- (void)viewWillLayoutSubviews
+{
+    [super viewWillLayoutSubviews];
+    NSLog(@"sfdfd  viewDidLayoutSubviews");
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:YES];
+    NSLog(@"sfdfd  viewWillDisappear");
+    if([DMyAfHTTPClient sharedClient].indicator.animatCount)
+        [DMyAfHTTPClient sharedClient].indicator.animatCount = 0;
+    [[DMyAfHTTPClient sharedClient].indicator progresshHUDRemovedFast];
+}
+#pragma mark -
+/**--------------------------------------------------------------------------------------
+ *  集成刷新控件
+ */
+//加载数据
+- (void) loadData:(void (^)(BOOL finish))success
+{
+    if (isEnd) {
+//        showMessage(@"加载完成");
+        success (YES);
+    }else{
+        [self loadZiyingTuijian:^(BOOL finish) {
+            success(finish);
+        }];
+    }
+}
+
+//刷新数据
+- (void) refreshData:(void (^)(BOOL finish))success
+{
+    //重新加载数据。一切都重新初始化
+    [self.footer resetNoMoreData];
+    isEnd = NO;
+    page = 0;
+    if ((tuijianArr != nil)&&(tuijianArr.count > 0)) {
+        [tuijianArr removeAllObjects];
+        tuijianArr = nil;
+    }
+    tuijianArr = [[NSMutableArray alloc]init];
+    
+    [self loadData:^(BOOL finish) {
+        success(finish);
+    }];
+}
+
+//加载下拉刷新和上拉加载
+- (void) addHeaderAndFooter
+{
+    // 设置回调（一旦进入刷新状态，就调用target的action，也就是调用self的loadNewData方法）
+    self.header = [MJRefreshGifHeader headerWithRefreshingBlock:^{
+        [self refreshData:^(BOOL finish) {
+            [self.header endRefreshing];
+        }];
+    }];
+    //设置图片
+    [self.header prepare];
+    
+    // 设置普通状态的动画图片
+    NSMutableArray *idleImages = [NSMutableArray array];
+    UIImage *image = [UIImage imageNamed:@"1.png"];
+    [idleImages addObject:image];
+    UIImage *image1 = [UIImage imageNamed:@"2.png"];
+    [idleImages addObject:image1];
+    [self.header setImages:idleImages forState:MJRefreshStateIdle];
+    
+    [self.header setImages:idleImages forState:MJRefreshStatePulling];
+    
+    // 设置正在刷新状态的动画图片
+    [self.header setImages:idleImages forState:MJRefreshStateRefreshing];
+    
+    // 隐藏时间
+    self.header.lastUpdatedTimeLabel.hidden = YES;
+    
+    // 隐藏状态
+    self.header.stateLabel.hidden = YES;
+    
+    self.mainTableView.header = self.header;
+    //    [self.header beginRefreshing];
+    // 设置回调（一旦进入刷新状态，就调用target的action，也就是调用self的loadMoreData方法）
+    self.footer = [MJRefreshBackNormalFooter footerWithRefreshingBlock:^{
+        [self loadData:^(BOOL finish) {
+            [self.footer endRefreshing];
+            if (isEnd == YES) {
+                // 拿到当前的上拉刷新控件，变为没有更多数据的状态
+                [self.mainTableView.footer noticeNoMoreData];
+                //                [self.footer setState:MJRefreshStateLoadIngEnd];
+                //                self.footer.statusLabel.text = @"内容全部加载完毕";
+            }
+        }];
+    }];
+    // 设置文字
+    [self.footer setTitle:@"下拉加载刷新" forState:MJRefreshStateIdle];
+    [self.footer setTitle:@"加载中 ..." forState:MJRefreshStateRefreshing];
+    [self.footer setTitle:@"全部加载完毕" forState:MJRefreshStateNoMoreData];
+    
+    // 设置字体
+    self.footer.stateLabel.font = [UIFont systemFontOfSize:17];
+    
+    // 设置颜色
+    self.footer.stateLabel.textColor = [UIColor grayColor];
+    
+    self.mainTableView.footer = self.footer;
+    //    [self.footer beginRefreshing];
+    
+}
+/*
+ **  列表 cell 从头显示
+ */
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if ([cell respondsToSelector:@selector(setSeparatorInset:)]) {
+        [cell setSeparatorInset:UIEdgeInsetsZero];
+    }
+    if ([cell respondsToSelector:@selector(setLayoutMargins:)]) {
+        [cell setLayoutMargins:UIEdgeInsetsZero];
+    }
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+#pragma mark------
+#pragma mark------UITableViewDataSource  UITableViewDelegate---------
+- (CGFloat) tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    if (_isTuijian) {
+        return 0.5;
+    }
+    return 6.0;
+}
+- (CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    if (_isTuijian) {
+        return 0.5;
+    }
+    return 0.5;
+}
+- (NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
+{
+    if (_isTuijian) {
+        return 1;
+    }
+    if (ziyingArr.count > 0) {
+        [self.noDataView setHidden:YES];
+        return ziyingArr.count;
+    }
+    [self.noDataView setHidden:NO];
+    return 0;
+}
+
+- (CGFloat) tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (_isTuijian) {
+        return 100.0f;
+    }
+    return DWIDTH_CONTROLLER_DEFAULT/5.0*2+30.0;
+}
+- (NSInteger) tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    if (_isTuijian) {
+        if (tuijianArr.count > 0) {
+            [self.noDataView setHidden:YES];
+            return tuijianArr.count;
+        }
+        [self.noDataView setHidden:NO];
+        return 0;
+    }
+       return 1;
+}
+
+//- (UIView *) tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+//{
+//    if (isTuijian) {
+//        
+//    }
+//        return nil;
+//}
+
+- (UITableViewCell *) tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (_isTuijian) {
+        [self.mainTableView registerNib:[UINib nibWithNibName:@"DGoodsListTableViewCell" bundle:nil] forCellReuseIdentifier:@"goodslist"];
+        DGoodsListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"goodslist"];
+        if (tuijianArr.count > indexPath.row) {
+            cell.ziyingTuijianModel = (DReXiaoGoodsModel *)[tuijianArr objectAtIndex:indexPath.row];
+        }
+        return cell;
+    }
+    DZiyingCell *cell1 = [DTools loadTableViewCell:self.mainTableView cellClass:[DZiyingCell class]];
+    if (ziyingArr.count > indexPath.section) {
+        cell1.ziyingCateModel = (DZiyingCateModel *)[ziyingArr objectAtIndex:indexPath.section];
+    }
+    
+    return cell1;
+    return nil;
+}
+
+- (void) tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    //取消点击选中状态
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    if (_isTuijian) {
+        DWebViewController *vc = [[DWebViewController alloc]init];
+        DReXiaoGoodsModel *model = [tuijianArr objectAtIndex:indexPath.row];
+        vc.urlStr = [NSString stringWithFormat:@"goodsId=%@&userId=%@",model.goods_id,get_userId];
+        vc.type = IS_NEED_ADD;
+        vc.goodId = [NSString stringWithFormat:@"%@",model.goods_id];
+        vc.imageUrl = [NSString stringWithFormat:@"%@",model.default_image];
+        vc.googsTitle = [NSString stringWithFormat:@"%@",model.goods_name];
+        vc.isHelp = 6;
+        push(vc);
+    }else{
+        DGoodsListViewController *goodsListVC = [[DGoodsListViewController alloc] init];
+        DZiyingCateModel *model = (DZiyingCateModel *)[ziyingArr objectAtIndex:indexPath.section];
+        goodsListVC.cateId = [NSString stringWithFormat:@"%@",model.cateId];
+        push(goodsListVC);
+    }
+}
+
+#pragma mark------
+#pragma mark------http request---------
+- (void) loadZiyingTuijian:(void (^)(BOOL finish))success
+{
+    NSDictionary *paramerDic;
+    if ([FileOperation isLogin]) {
+        paramerDic = @{@"userId":[FileOperation getUserId],@"page":[NSString stringWithFormat:@"%d",page+1],@"pageSize":@"10"};
+    }else{
+        paramerDic = @{@"userId":@"",@"page":[NSString stringWithFormat:@"%d",page+1],@"pageSize":@"10"};
+    }
+   [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"ZiYings.index" parameters:paramerDic ifAddActivityIndicator:isFirst success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+       if (responseObject.succeed) {
+           NSArray *dataArr = [NSArray arrayWithArray:[responseObject.result objectForKey:@"data"]];
+           for (NSDictionary *dic in dataArr) {
+               DReXiaoGoodsModel *item = [[DReXiaoGoodsModel alloc]init];
+               item = [JsonStringTransfer dictionary:dic ToModel:item];
+               [tuijianArr addObject:item];
+           }
+           [self.mainTableView reloadData];
+           page++;
+           if (dataArr.count < 10) {
+               isEnd = YES;
+           }
+       }else{
+//           showMessage(@"请求失败");
+       }
+       success(YES);
+   } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+       success(YES);
+//       showMessage(@"请求失败");
+   }];
+    isFirst = NO;
+}
+
+//手机数码
+- (void) getCateList
+{
+//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"ZiYings.show" parameters:@{@"cateId":[NSString stringWithFormat:@"%@",self.ziyingModel.cateId]} ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+            NSLog(@"ziyingArr = %@",ziyingArr);
+            if (responseObject.succeed) {
+                if ((ziyingArr != nil)&&(ziyingArr.count > 0)) {
+                    [ziyingArr removeAllObjects];
+                    ziyingArr = nil;
+                }
+                ziyingArr = [[NSMutableArray alloc]init];
+                for (NSDictionary *dic in responseObject.result) {
+                    DZiyingCateModel *item = [[DZiyingCateModel alloc]init];
+                    item = [JsonStringTransfer dictionary:dic ToModel:item];
+                    [ziyingArr addObject:item];
+                }
+//                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self.mainTableView reloadData];
+//                });
+            }else{
+//                showMessage(@"请求失败");
+            }
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+//            showMessage(@"请求失败");
+        }];
+
+//    });
+
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end

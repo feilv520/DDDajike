@@ -1,0 +1,405 @@
+//
+//  AppDelegate.m
+//  jibaobao
+//
+//  Created by dajike on 15/4/23.
+//  Copyright (c) 2015年 dajike. All rights reserved.
+//
+
+#import "AppDelegate.h"
+#import "UMSocial.h"
+//#import "MobClick.h"
+#import "UMSocialWechatHandler.h"
+#import "UMSocialQQHandler.h"
+#import "UMSocialSinaHandler.h"
+#import "defines.h"
+#import "WXApi.h"
+#import "UMessage.h"
+#import <BaiduMapAPI/BMKMapManager.h>
+#import <BaiduMapAPI/BMKMapView.h>
+
+#define UMSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+
+#define _IPHONE80_ 80000
+
+//#import "ums"
+
+static NSString *shareUrl = @"https://itunes.apple.com/us/app/ji-bao-bao/id996401785?l=zh&ls=1&mt=8";
+//static NSString *shareUrl = @"https://baidu.com";
+
+@interface AppDelegate ()<WXApiDelegate>{
+    BMKMapManager *_mapManager;
+}
+
+@end
+
+@implementation AppDelegate
+
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    //获取并存储定位城市
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        //获取定位城市／／Regions.findCityByIp
+        [[MyAfHTTPClient sharedClient]postPathWithMethod:@"Regions.locationCity" parameters:@{@"latitude":@"",@"longitude":@""} ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+            if (responseObject.succeed) {
+                NSMutableArray *citysArr = [[NSMutableArray alloc]init];
+                NSDictionary *cityDic = @{@"regionName":@"全城",@"regionId":[responseObject.result objectForKey:@"regionId"]};
+                [citysArr addObject:cityDic];
+                for (NSArray *arr in [responseObject.result objectForKey:@"subRegions"]) {
+                    NSDictionary *dic = @{@"regionName":[arr objectAtIndex:1],@"regionId":[arr objectAtIndex:0]};
+                    [citysArr addObject:dic];
+                }
+                
+                [FileOperation setPlistObject:citysArr forKey:kCurrentCityArr ofFilePath:[FileOperation creatPlistIfNotExist:SET_PLIST]];
+                //存储定位城市
+                [FileOperation writeDingweiCityWithCityName:[responseObject.result objectForKey:@"regionName"] andCityId:[NSString stringWithFormat:@"%@",[responseObject.result objectForKey:@"regionId"]]];
+                
+                [FileOperation writeCurrentCityWithCityName:[responseObject.result objectForKey:@"regionName"] andCityId:[NSString stringWithFormat:@"%@",[responseObject.result objectForKey:@"regionId"]]];
+                [FileOperation writeSelectIndex:0];
+            }else{
+                [ProgressHUD showMessage:@"定位失败。" Width:280 High:10];
+            }
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            NSLog(@"error = %@",error);
+            //定位失败，显示以前定位城市
+            [ProgressHUD showMessage:@"定位失败。" Width:280 High:10];
+        }];
+        
+    });
+    //询问开启定位操作
+#if TARGET_IPHONE_SIMULATOR
+    //写入plist
+    [FileOperation writeLatitude:@"31.326362"];
+    [FileOperation writeLongitude:@"121.442765"];
+#elif TARGET_OS_IPHONE
+    //当前经纬度
+    [[CCLocationManager shareLocation]getLocationCoordinate:^(CLLocationCoordinate2D locationCorrrdinate) {
+        //写入plist
+        [FileOperation writeLatitude:[NSString stringWithFormat:@"%f",locationCorrrdinate.latitude]];
+        [FileOperation writeLongitude:[NSString stringWithFormat:@"%f",locationCorrrdinate.longitude]];
+    }];
+#endif
+    
+    
+    //启动页面停留约3秒钟
+    //    [NSThread sleepForTimeInterval:2];
+    // Override point for customization after application launch.
+    //set AppKey and LaunchOptions
+    [UMessage startWithAppkey:@"559207cb67e58ece1f0020d7" launchOptions:launchOptions];
+    
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= _IPHONE80_
+    if(UMSYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0"))
+    {
+        //register remoteNotification types
+        UIMutableUserNotificationAction *action1 = [[UIMutableUserNotificationAction alloc] init];
+        action1.identifier = @"action1_identifier";
+        action1.title=@"Accept";
+        action1.activationMode = UIUserNotificationActivationModeForeground;//当点击的时候启动程序
+        
+        UIMutableUserNotificationAction *action2 = [[UIMutableUserNotificationAction alloc] init];  //第二按钮
+        action2.identifier = @"action2_identifier";
+        action2.title=@"Reject";
+        action2.activationMode = UIUserNotificationActivationModeBackground;//当点击的时候不启动程序，在后台处理
+        action2.authenticationRequired = YES;//需要解锁才能处理，如果action.activationMode = UIUserNotificationActivationModeForeground;则这个属性被忽略；
+        action2.destructive = YES;
+        
+        UIMutableUserNotificationCategory *categorys = [[UIMutableUserNotificationCategory alloc] init];
+        categorys.identifier = @"category1";//这组动作的唯一标示
+        [categorys setActions:@[action1,action2] forContext:(UIUserNotificationActionContextDefault)];
+        
+        UIUserNotificationSettings *userSettings = [UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeBadge|UIUserNotificationTypeSound|UIUserNotificationTypeAlert
+                                                                                     categories:[NSSet setWithObject:categorys]];
+        [UMessage registerRemoteNotificationAndUserNotificationSettings:userSettings];
+        
+    } else{
+        //register remoteNotification types
+        [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
+         |UIRemoteNotificationTypeSound
+         |UIRemoteNotificationTypeAlert];
+    }
+#else
+    
+    //register remoteNotification types
+    [UMessage registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge
+     |UIRemoteNotificationTypeSound
+     |UIRemoteNotificationTypeAlert];
+    
+#endif
+    
+    //for log
+    [UMessage setLogEnabled:NO];
+    [self application:application didReceiveRemoteNotification:[launchOptions valueForKey:@"UIApplicationLaunchOptionsRemoteNotificationKey"]];
+    //    if (launchOptions) {
+    //        NSError *parseError = nil;
+    //
+    //        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:launchOptions options:NSJSONWritingPrettyPrinted error:&parseError];
+    //
+    //        NSString *str =  [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    //        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"标题1"
+    //                                                            message:str
+    //                                                           delegate:self
+    //                                                  cancelButtonTitle:@"确定1"
+    //                                                  otherButtonTitles:nil];
+    //
+    //        [alertView show];
+    //
+    //    }
+    
+    //添加友盟分享｀组件
+    //    [UMSocialData setAppKey:@"555ac81667e58e2fb5002888"];
+    [UMSocialData setAppKey:@"559207cb67e58ece1f0020d7"];
+    [UMSocialConfig hiddenNotInstallPlatforms: @[UMShareToQQ, UMShareToQzone, UMShareToWechatTimeline, UMShareToWechatTimeline]];
+    //设置微信AppId，设置分享url，默认使用友盟的网址
+    [UMSocialWechatHandler setWXAppId:@"wx2f74d0eccd769b73" appSecret:@"30663cc15764de7277c67897f0c5be98" url:shareUrl];
+    
+    //打开新浪微博的SSO开关
+    [UMSocialSinaHandler openSSOWithRedirectURL:shareUrl];
+    //    [UMSocialSinaSSOHandler openNewSinaSSOWithRedirectURL:@"http://sns.whalecloud.com/sina2/callback"];
+    
+    //    //设置分享到QQ空间的应用Id，和分享url 链接 jibaobao
+    //    [UMSocialQQHandler setQQWithAppId:@"1104578779" appKey:@"V8acTyt0zTrUselN" url:@"http://www.umeng.com/social"];
+    //设置手机QQ的AppId，指定你的分享url，若传nil，将使用友盟的网址 友盟
+    //集宝宝
+    [UMSocialQQHandler setQQWithAppId:@"1104578779" appKey:@"V8acTyt0zTrUselN" url:shareUrl];
+    //如医
+    //    [UMSocialQQHandler setQQWithAppId:@"100424468" appKey:@"c7394704798a158208a74ab60104f0ba" url:shareUrl];
+    
+    //    //设置支持没有客户端情况下使用SSO授权
+    [UMSocialQQHandler setSupportWebView:YES];
+    
+    [WXApi registerApp:@"wx2f74d0eccd769b73"];
+    // 获取相关域名
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self getDomainUrl];
+    });
+    
+    //百度地图
+    _mapManager = [[BMKMapManager alloc]init];
+    BOOL ret = [_mapManager start:@"xnq1drmCuwuvmSLWNTu5V8Hx" generalDelegate:nil];
+    if (!ret) {
+        NSLog(@"manager start failed!");
+    }
+    
+    return YES;
+}
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+{
+    return  [UMSocialSnsService handleOpenURL:url];
+}
+
+
+/**
+ 这里处理新浪微博SSO授权之后跳转回来，和微信分享完成之后跳转回来
+ */
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+    NSLog(@"%@",url);
+    NSLog(@"vvvv =%@",[[NSString stringWithFormat:@"%@",url] substringToIndex:24]);
+    if ([sourceApplication isEqualToString:@"com.tencent.xin"]) {
+        if ([[[NSString stringWithFormat:@"%@",url] substringToIndex:24] isEqualToString:@"wx2f74d0eccd769b73://pay"]) {
+            return [WXApi handleOpenURL:url delegate:self];
+        }else{
+            return  [UMSocialSnsService handleOpenURL:url wxApiDelegate:nil];
+        }
+        
+    }else
+        return  [UMSocialSnsService handleOpenURL:url wxApiDelegate:nil];
+}
+
+/**
+ 这里处理新浪微博SSO授权进入新浪微博客户端后进入后台，再返回原来应用
+ */
+- (void)applicationDidBecomeActive:(UIApplication *)application
+{
+    [UMSocialSnsService  applicationDidBecomeActive];
+    //百度地图
+    [BMKMapView didForeGround];
+    
+}
+
+- (void)onResp:(BaseResp *)resp
+{
+    NSLog(@"%@",resp);
+    NSString *strMsg = [NSString stringWithFormat:@"errcode:%d", resp.errCode];
+    NSString *strTitle;
+    if([resp isKindOfClass:[PayResp class]]){
+        //支付返回结果，实际支付结果需要去微信服务器端查询
+        strTitle = [NSString stringWithFormat:@"支付结果"];
+        
+        switch (resp.errCode) {
+            case WXSuccess:
+                [[NSNotificationCenter defaultCenter]postNotificationName:@"buySuccess" object:nil];
+                //                strMsg = @"支付结果：成功！";
+                NSLog(@"支付成功－PaySuccess，retcode = %d", resp.errCode);
+                break;
+                
+            default: {
+                strMsg = [NSString stringWithFormat:@"支付结果：失败！"];
+                NSLog(@"错误，retcode = %d, retstr = %@", resp.errCode,resp.errStr);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:strTitle message:strMsg delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+                
+                [alert show];
+            }
+                
+                break;
+        }
+    }
+    
+}
+
+
+// 获取相关域名
+- (void)getDomainUrl
+{
+    
+    
+    //    //构造支付请求
+    //    PayReq *request = [[PayReq alloc]init];
+    //    request.partnerId = @"1245407702";
+    //    request.prepayId = @"wx2015061513564912897b8cd60272172997";
+    //    request.package = @"Sign=WXPay";
+    //    request.nonceStr = @"aRIC2rP1avfP5mnZ";
+    //    request.timeStamp = [@"1434347807" intValue];
+    //    NSLog(@"%u",(unsigned int)request.timeStamp);
+    //
+    //    request.sign = @"F1468509134EE6FE8060724DF1A6F4E7";
+    //
+    //    [WXApi sendReq:request];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        [[MyAfHTTPClient sharedClient]postPathWithMethod:@"Configs.domain" parameters:nil ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+            if (responseObject.succeed) {
+                NSLog(@"result = %@",responseObject.result);
+                
+                NSMutableDictionary *tmpDic = [responseObject.result mutableCopy];
+                
+                NSString *filePath = [FileOperation creatPlistIfNotExist:SET_PLIST];
+                [FileOperation writeToPlistFile:filePath withDic:tmpDic];
+                
+                //                dispatch_async(dispatch_get_main_queue(), ^{
+                //
+                //                });
+                
+            }
+            else
+            {
+                if ([responseObject.msg length] == 0) {
+                    [ProgressHUD showMessage:@"请求失败" Width:100 High:80];
+                }else
+                    [ProgressHUD showMessage:responseObject.msg Width:100 High:80];
+            }
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            NSLog(@"error = %@",error);
+            NSLog(@"operation6 = %@",operation);
+        }];
+    });
+}
+
+
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
+    // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
+    //百度地图
+    [BMKMapView willBackGround];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
+    // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+}
+
+//- (void)applicationDidBecomeActive:(UIApplication *)application {
+//    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+//}
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    [UMessage registerDeviceToken:deviceToken];
+    NSString *pushToken = [[[[deviceToken description]
+                             
+                             stringByReplacingOccurrencesOfString:@"<" withString:@""]
+                            
+                            stringByReplacingOccurrencesOfString:@">" withString:@""]
+                           
+                           stringByReplacingOccurrencesOfString:@" " withString:@""];
+    [FileOperation writeDeviceToken:pushToken];
+    
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+    //关闭友盟自带的弹出框
+    [UMessage setAutoAlert:NO];
+    
+    [UMessage didReceiveRemoteNotification:userInfo];
+    
+    //    self.userInfo = userInfo;
+    //    //定制自定的的弹出框
+    //    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+    //    {
+    //        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"标题"
+    //                                                            message:@"Test On ApplicationStateActive"
+    //                                                           delegate:self
+    //                                                  cancelButtonTitle:@"确定"
+    //                                                  otherButtonTitles:nil];
+    //
+    //        [alertView show];
+    //
+    //    }
+    if (userInfo) {
+        //        NSError *parseError = nil;
+        //
+        //        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:userInfo options:NSJSONWritingPrettyPrinted error:&parseError];
+        //
+        //        NSString *str =  [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        //        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"标题1"
+        //                                                            message:str
+        //                                                           delegate:self
+        //                                                  cancelButtonTitle:@"确定1"
+        //                                                  otherButtonTitles:nil];
+        //
+        //        [alertView show];
+        
+        [FileOperation writeAMessage:[userInfo objectForKey:@"aps"]];
+        [FileOperation writeMessageNum:[[[userInfo objectForKey:@"aps"] objectForKey:@"badge"]integerValue]];
+    }
+    
+}
+//- (void)application:(UIApplication *)application didReceiveRemoteNotification
+//                   :(NSDictionary *)userInfo fetchCompletionHandler
+//                   :(void (^)(UIBackgroundFetchResult))completionHandler {
+//    if (userInfo) {
+//        NSError *parseError = nil;
+//
+//        NSData *jsonData = [NSJSONSerialization dataWithJSONObject:userInfo options:NSJSONWritingPrettyPrinted error:&parseError];
+//
+//        NSString *str =  [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+//        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"标题1"
+//                                                            message:str
+//                                                           delegate:self
+//                                                  cancelButtonTitle:@"确定1"
+//                                                  otherButtonTitles:nil];
+//        
+//        [alertView show];
+//        
+//        [FileOperation writeAMessage:[userInfo objectForKey:@"aps"]];
+//        [FileOperation writeMessageNum:[[[userInfo objectForKey:@"aps"] objectForKey:@"badge"]integerValue]];
+//    }
+//}
+//
+
+
+
+
+@end

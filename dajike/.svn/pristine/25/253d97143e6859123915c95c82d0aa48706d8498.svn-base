@@ -1,0 +1,173 @@
+//
+//  MethodHead.h
+//  jibaobao
+//
+//  Created by dajike on 15/5/29.
+//  Copyright (c) 2015年 dajike. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+
+//分享  跳转链接
+extern NSString * const SHARE_URL;
+//帮助中心
+extern NSString * const HELP_CENTER;
+//关于我们
+extern NSString * const ABOUT_US;
+//大集客用户协议公告
+extern NSString * const DJK_USER_ARGUMENT;
+//抽奖规则
+extern NSString * const CHOUJIANG_RULE;
+//特别声明
+extern NSString * const SPECIAL_DECLEAR;
+extern NSString* const GOODS_DETAIL;
+
+
+//------------------------------------------------
+//--------------首页---------------------------------
+extern NSString * const METHOD_HELP_ADD_FEEDBACK;            //eg
+
+extern NSString* const  GUANGGAO_HTMLS_SHOW;                 //广告
+extern NSString* const  GUANGGAO_HTMLS_FUJINYOUHUI;          //首页广告（附近优惠）
+//extern NSString* const  STORES_HOMESEARCH;                 //首页搜索
+//------------------------------------------------
+//--------------附近---------------------------------
+extern NSString* const  STORE_LIST;                          //商家列表
+
+//------------------------------------------------
+//--------------美食---------------------------------
+extern NSString* const  STORE_SHOW_BASIC;                    //商家详情--基本信息
+extern NSString* const  CONFIGS_SORTFIELDS;                  //排序字段
+
+//------------------------------------------------
+//--------------休闲娱乐---------------------------------
+
+
+
+//------------------------------------------------
+//--------------购物---------------------------------
+extern NSString* const  SHOPPINGS_INDEX;                      //首页
+extern NSString* const  GOODS_LIST;//商品列表
+extern NSString* const  GOODS_GOODSDETAIL;                    //商品详情--基本信息
+extern NSString* const  GOODS_GOODSPHOTOS;                    //商品相册
+extern NSString* const  GOODS_COMMENTS;                       //商品评论
+extern NSString* const  GOODS_GOODSCATEGORY;                  //商品分类
+extern NSString* const  ORDERS_CREATEORDER;                   //创建订单
+
+//------------------------------------------------
+//--------------我的---------------------------------
+//**************我的设置***********************
+//extern NSString* const  MYSETTINGS_INDEX;
+
+//**************个人资料***********************
+extern NSString* const  MYUSERINFOS_INDEX;
+extern NSString* const  MYUSERINFOS_UPDATENICKNAME;           //修改昵称
+extern NSString* const  MYUSERINFOS_UPDATEGENDER;             //修改性别
+extern NSString* const  MYUSERINFOS_BINDMOBILEPHONE;          //绑定手机
+extern NSString* const  MYUSERINFOS_UPDATEPASSWORD;           //修改密码
+extern NSString* const  MYUSERINFOS_UPDATEPASSWORD2;          //修改支付密码
+extern NSString* const  MYUSERINFOS_COUNTCOUPONS;             //我的优惠券总数
+extern NSString* const  MYUSERINFOS_COUNTCOLLECTS;            //我的收藏总数
+
+//**************我的账户***********************
+extern NSString* const  MYFINANCES_INDEX;                     //账户概览
+extern NSString* const  MYFINANCES_SHOUYI;                    //收益账户明细列表
+extern NSString* const  MYFINANCES_CHONGZHI;                  //充值账户明细列表
+extern NSString* const  MYFINANCES_JIFEN;                     //积分明细列表
+extern NSString* const  MYFINANCES_YINGYEE;                   //营业额户明细列表
+extern NSString* const  MYFINANCES_JIANGLISHOUYI;             //奖励收益明细列表
+extern NSString* const  MYFINANCES_CHOUJIANGSHOUYI;           //抽奖收益明细列表
+extern NSString* const  MYBANKS_TIXIAN;                       //转账
+
+//**************我的收藏***********************
+extern NSString* const  MYCOLLECTSS_COUPONLIST;               //收藏的优惠券列表
+extern NSString* const  MYCOLLECTSS_STORELIST;                //收藏的商家列表
+extern NSString* const  MYCOLLECTSS_DELETE;                   //删除我的收藏
+
+//**************我的订单***********************
+extern NSString* const  MYORDERS_AJAXLIST;                    //分页查询订单
+extern NSString* const  MYORDERS_DETAIL;                      //订单详情
+extern NSString* const  MYORDERS_EVALUATE;                    //评价订单
+extern NSString* const  MYORDERS_CREATEORDER;                 //创建订单
+
+//**************我的优惠券***********************
+extern NSString* const  MYCOUPONS_LIST;                       //优惠券列表
+extern NSString* const  MYCOUPONS_DETAOL;                     //优惠券详情
+
+//**************我的账号***********************
+extern NSString* const  MYACCOUNTS_LOGIN;                     //登陆
+extern NSString* const  MYACCOUNTS_FASTLOGIN;                 //无密码手机快速登录
+extern NSString* const  MYACCOUNTS_QQLOGIN;                   //QQ账号登陆
+extern NSString* const  MYACCOUNTS_WEIXINLOGIN;               //微信账号登陆
+extern NSString* const  MYACCOUNTS_REGISTRY;                  //注册
+extern NSString* const  MYACCOUNTS_SETPASSWORD2;              //设置支付密码
+extern NSString* const  MYACCOUNTS_FINDPASSWORDVALIDATE;      //找回密码， 验证短信
+
+//**************我的收货地址***********************
+extern NSString* const  MYADDRESS_LIST;                       //地址列表
+extern NSString* const  MYADDRESS_UPDATE;                     //编辑收货地址
+extern NSString* const  MYADDRESS_CREATE;                     //创建收货地址
+extern NSString* const  MYADDRESS_DELETE;                     //删除收货地址
+extern NSString* const  MYADDRESS_SAVEDEFAULT;                //设置默认收货地址
+
+//**************我的银行卡***********************
+extern NSString* const  MYBANKS_LIST;                         //绑定银行卡列表
+extern NSString* const  MYBANKS_CREATE;                       //绑定银行卡
+extern NSString* const  MYBANKS_DELETE;                       //解绑银行卡
+extern NSString* const  MYBANKS_SAVE;                         //修改银行卡
+extern NSString* const  MYBANKS_SHOW;                         //展示单个银行卡
+extern NSString* const  MYBANKS_SAVEDEFAULT;                  //设置默认银行卡
+extern NSString* const  MYBANKS_CHANNELLIST;                  //银行卡类型列表
+//extern NSString* const  MYBANKS_TIXIAN;                     //提现申请
+
+//**************开单、优惠券验证***********************
+extern NSString* const  MYKAIDANS_CREATE;                     //开单
+extern NSString* const  MYKAIDANS_KAIDANLIST;                 //开单记录列表
+extern NSString* const  MYKAIDANS_VALIDATECOUPONCODE;         //已验证的优惠券的列表
+
+//------------------------------------------------
+//--------------抽奖---------------------------------
+//extern NSString* const  CHOUJIANGS_INDEX;                   //抽奖首页
+//extern NSString* const  CHOUJIANGS_RULES;                   //抽奖规则
+//extern NSString* const  CHOUJIANGS_QUERY;                   //奖金查询
+
+//------------------------------------------------
+//--------------商家类(Stores)---------------------------------
+extern NSString* const  STORES_ALLCATEGORYLISTS;              //商家列表—商家分类
+extern NSString* const  STORES_DETAIL;                        //商家详情—基本信息
+extern NSString* const  STORES_PHOTO;                         //商家详情—商家相册
+extern NSString* const  STORES_COUPON;                        //商家详情—代金券
+extern NSString* const  STORES_STORETUIJIAN;                  //商家详情—推荐商品
+extern NSString* const  STORES_COMMENTS;                      //商家详情—商家评论
+//extern NSString* const  STORES_FJLIST;                      //附近商家
+
+//------------------------------------------------
+//-------------商品类(Goods)---------------------------------
+extern NSString* const  GOODS_COUPONDETAIL;                   //代金券详情-基本信息
+extern NSString* const  GOODS_RECOMDGOODS;                    //代金券详情-推荐商品
+
+//------------------------------------------------
+//--------------收货地址类(Addresss)---------------------------------
+extern NSString* const  ADDRESS_LIST;                         //地址列表
+
+//------------------------------------------------
+//--------------发送消息类(Sends)---------------------------------
+extern NSString* const  SENDS_SMS;                            //发送手机短信
+extern NSString* const  SENDS_EMAIL;                          //发送邮件
+//extern NSString* const  SENDS_MESSAGE;                      //推送消息
+
+//------------------------------------------------
+//--------------配置类(Configs)---------------------------------
+extern NSString* const  CONFIGS_DOMAIN;                       //域名配置
+
+
+
+
+
+
+
+
+
+@interface MethodHead : NSObject
+
+@end

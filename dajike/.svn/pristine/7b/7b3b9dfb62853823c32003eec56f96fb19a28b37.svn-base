@@ -1,0 +1,39 @@
+//
+//  DBuySeccess1Cell.m
+//  dajike
+//
+//  Created by swb on 15/7/22.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DBuySeccess1Cell.h"
+#import "dDefine.h"
+
+@implementation DBuySeccess1Cell
+
+- (void)awakeFromNib {
+    // Initialization code
+}
+
+- (void)setModel:(OrdersDetailModel *)model
+{
+//    self.orderSnLb.text = model.orderSn;
+    self.moneyLb.text = [NSString stringWithFormat:@"%.2f",[model.orderAmount floatValue]];
+}
+
+- (void)setOrderSnArr:(NSMutableArray *)orderSnArr
+{
+    self.moneyLb.text = self.allMoney;
+//    self.orderSnViewCon.constant = 
+//    for (int i=0; i<orderSnArr.count;i++) {
+//        UILabel *titleLb = [UILabel alloc]initWithFrame:DRect(8, 8+i*, <#w#>, <#h#>)
+//    }
+}
+
+- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+
+    // Configure the view for the selected state
+}
+
+@end

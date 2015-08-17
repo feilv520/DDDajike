@@ -1,0 +1,425 @@
+//
+//  DCouponOrderDetailViewController.m
+//  dajike
+//
+//  Created by swb on 15/7/20.
+//  Copyright (c) 2015年 haixia. All rights reserved.
+//
+
+#import "DCouponOrderDetailViewController.h"
+#import "dDefine.h"
+#import "MyClickLb.h"
+#import "DOrderOperation.h"
+//cell
+#import "DCoupon1Cell.h"
+#import "IndentDetailCell2.h"
+#import "IndentDetailCell3.h"
+//model
+//controller
+#import "DGoodCommetViewController.h"
+
+//宏
+#define BTN_WIDTH 90
+#define BTN_HEIGHT 35
+#define BTN_INTERVAL ((DWIDTH_CONTROLLER_DEFAULT-(BTN_WIDTH*3))/4)
+
+#define ONE_BTN ((DWIDTH_CONTROLLER_DEFAULT-BTN_WIDTH)/2)
+#define TWO_BTN (DWIDTH_CONTROLLER_DEFAULT/2-BTN_WIDTH-BTN_INTERVAL/2)
+
+@interface DCouponOrderDetailViewController ()<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate>
+{
+    OrdersDetailModel *_ordersDetailModel;
+    
+    UILabel *lb1;
+    UILabel *lb2;
+    UILabel *lb3;
+    
+    //屏幕底部的按钮
+    MyClickLb *lbLeft;
+    MyClickLb *lbCenter;
+    MyClickLb *lbRight;
+}
+
+@end
+
+@implementation DCouponOrderDetailViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    [self setNaviBarTitle:@"订单详情"];
+    _ordersDetailModel = [[OrdersDetailModel alloc]init];
+    [self addTableView:NO];
+    self.dMainTableView.delegate = self;
+    self.dMainTableView.dataSource = self;
+    self.dMainTableView.frame = DRect(0, 44, DWIDTH_CONTROLLER_DEFAULT, DHEIGHT_CONTROLLER_DEFAULT-50);
+    [self initBottomBtnUI];
+    
+    [self myOrdersDetail];
+}
+
+//订单详情
+- (void)myOrdersDetail
+{
+    NSMutableDictionary *parameter = [NSMutableDictionary dictionaryWithObjectsAndKeys:get_userId, @"userId", self.model.order_id,@"orderId",  @"buyer",@"type",nil];
+    //    NSMutableDictionary *parameter = [NSMutableDictionary dictionaryWithObjectsAndKeys:@"2", @"userId", @"507",@"orderId",  @"buyer",@"type",nil];
+    [[DMyAfHTTPClient sharedClient]postPathWithMethod:@"MyOrders.detail" parameters:parameter ifAddActivityIndicator:NO success:^(AFHTTPRequestOperation *operation, PostData *responseObject) {
+        NSLog(@"operation6 = %@",operation);
+        if (responseObject.succeed) {
+            NSLog(@"result = %@",responseObject.result);
+            NSMutableDictionary *dict0 = [responseObject.result mutableCopy];
+            NSMutableDictionary *dict = [[[dict0 objectForKey:@"orderGoods"]objectAtIndex:0]mutableCopy];
+            NSArray *keyArr = [dict allKeys];
+            for ( NSString *key in keyArr) {
+                [dict0 setValue:[dict objectForKey:key] forKey:key];
+            }
+            [dict0 removeObjectForKey:@"orderGoods"];
+            _ordersDetailModel = [[OrdersDetailModel alloc]init];
+            _ordersDetailModel = [JsonStringTransfer dictionary:dict0 ToModel:_ordersDetailModel];
+            [self setBottomLbFrame];
+            [self.dMainTableView reloadData];
+        }else{
+            
+        }
+        
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"error = %@",error);
+        NSLog(@"operation6 = %@",operation);
+    }];
+}
+//界面底部btn
+- (void)initBottomBtnUI
+{
+    UIView *viewBg = [self.view createViewWithFrame:DRect(0, DHEIGHT_CONTROLLER_DEFAULT-50, DWIDTH_CONTROLLER_DEFAULT, 50) andBackgroundColor:DColor_White];
+    [self.view addSubview:viewBg];
+    
+    UIView *lineV = [self.view createViewWithFrame:DRect(0, 0, DWIDTH_CONTROLLER_DEFAULT, 0.5) andBackgroundColor:DColor_line_bg];
+    [viewBg addSubview:lineV];
+    
+    lbLeft = [self createLbTitle];
+    lbLeft.frame = DRect(ONE_BTN, 7, BTN_WIDTH, BTN_HEIGHT);
+    lbCenter = [self createLbTitle];
+    lbRight = [self createLbTitle];
+    
+    __weak DCouponOrderDetailViewController *weakSelf = self;
+    [lbLeft callbackClickedLb:^(MyClickLb *clickLb) {
+        [weakSelf checkClickLbTitle:clickLb.text];
+    }];
+    [lbCenter callbackClickedLb:^(MyClickLb *clickLb) {
+        [weakSelf checkClickLbTitle:clickLb.text];
+    }];
+    [lbRight callbackClickedLb:^(MyClickLb *clickLb) {
+        [weakSelf checkClickLbTitle:clickLb.text];
+    }];
+    [viewBg addSubview:lbLeft];
+    [viewBg addSubview:lbCenter];
+    [viewBg addSubview:lbRight];
+}
+
+//集成创建底部控件
+- (MyClickLb *)createLbTitle
+{
+    MyClickLb *lb = [[MyClickLb alloc]initWithFrame:CGRectMake(0, 0, BTN_WIDTH, BTN_HEIGHT)];
+    lb.layer.cornerRadius = 3.0f;
+    lb.layer.masksToBounds = YES;
+    lb.layer.borderColor = DColor_line_bg.CGColor;
+    lb.layer.borderWidth = 0.8f;
+    lb.font = [UIFont systemFontOfSize:13.0f];
+    lb.textAlignment = NSTextAlignmentCenter;
+    lb.textColor = DColor_666666;
+    return lb;
+}
+//动态设定底部控件frame
+- (void)setBottomLbFrame
+{
+    switch ([_ordersDetailModel.status intValue]) {
+        case 0:{
+            lbLeft.text = @"删除订单";
+            lbCenter.hidden = YES;
+            lbRight.hidden = YES;}
+            break;
+        case 10:{
+            lbLeft.text = @"取消订单";
+            lbCenter.hidden = YES;
+            lbRight.hidden = YES;}
+            break;
+        case 11:{
+            lbLeft.text = @"取消订单";
+            lbLeft.frame = DRect(TWO_BTN, 7, BTN_WIDTH, BTN_HEIGHT);
+            lbCenter.text = @"付款";
+            lbCenter.textColor = DColor_White;
+            lbCenter.backgroundColor = DColor_c4291f;
+            lbRight.hidden = YES;}
+            break;
+        case 20:{
+            lbLeft.text = @"取消订单";
+            lbCenter.hidden = YES;
+            lbRight.hidden = YES;}
+            break;
+        case 30:{
+            lbLeft.text = @"查看物流";
+            lbLeft.frame = DRect(TWO_BTN, 7, BTN_WIDTH, BTN_HEIGHT);
+            lbCenter.text = @"确认收货";
+            lbRight.hidden = YES;}
+            break;
+        case 40:{
+            if (self.model.isCommented) {
+                lbLeft.text = @"删除订单";
+                lbLeft.frame = DRect(TWO_BTN, 7, BTN_WIDTH, BTN_HEIGHT);
+                lbCenter.text = @"查看物流";
+                lbRight.hidden = YES;
+            }else {
+                lbLeft.text = @"删除订单";
+                lbLeft.frame = DRect(BTN_INTERVAL, 7, BTN_WIDTH, BTN_HEIGHT);
+                lbCenter.text = @"查看物流";
+                lbRight.text = @"评价";
+                lbRight.textColor = DColor_White;
+                lbRight.backgroundColor = DColor_c4291f;
+            }}
+            break;
+            
+        default:
+            break;
+    }
+    lbCenter.frame = DRect(CGRectGetMaxX(lbLeft.frame)+BTN_INTERVAL, CGRectGetMinY(lbLeft.frame), BTN_WIDTH, BTN_HEIGHT);
+    lbRight.frame = DRect(CGRectGetMaxX(lbCenter.frame)+BTN_INTERVAL, CGRectGetMinY(lbLeft.frame), BTN_WIDTH, BTN_HEIGHT);
+}
+//动态设定按钮事件
+- (void)checkClickLbTitle:(NSString *)lbTitle
+{
+    if ([lbTitle isEqualToString:@"取消订单"]) {
+        NSLog(@"取消订单");
+        UIAlertView *alertV = [[UIAlertView alloc]initWithTitle:@"提示" message:@"您确定要取消该订单" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+        alertV.tag = 1;
+        [alertV show];
+    }
+    if ([lbTitle isEqualToString:@"删除订单"]) {
+        NSLog(@"删除订单");
+        UIAlertView *alertV = [[UIAlertView alloc]initWithTitle:@"提示" message:@"您确定要删除该订单" delegate:self cancelButtonTitle:@"取消" otherButtonTitles:@"确定", nil];
+        alertV.tag = 2;
+        [alertV show];
+    }
+    if ([lbTitle isEqualToString:@"付款"]) {
+        NSLog(@"付款");
+    }
+    if ([lbTitle isEqualToString:@"查看物流"]) {
+        NSLog(@"查看物流");
+    }
+    if ([lbTitle isEqualToString:@"确认收货"]) {
+        NSLog(@"确认收货");
+    }
+    if ([lbTitle isEqualToString:@"评价"]) {
+        NSLog(@"评价");
+        DGoodCommetViewController *vc = [[DGoodCommetViewController alloc]init];
+        vc.productAarry = [self.couponArr mutableCopy];
+        vc.orderId = self.model.order_id;
+        [vc callBack:^{
+            [self myOrdersDetail];
+            [self setBottomLbFrame];
+        }];
+        push(vc);
+    }
+}
+
+//------------------ 我是分割线 ，代码开始 ----------------------
+#pragma mark  TableView  Delegate & DataSource
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 6;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.row == 0) {
+        return 90;
+    }
+    if (indexPath.row == 5) {
+        return 120;
+    }
+    return 44;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 0.5;
+}
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
+{
+    return 0.5;
+}
+
+//- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section
+//{
+//    UIView *mView = [self.view createViewWithFrame:CGRectMake(0, 0, DWIDTH_CONTROLLER_DEFAULT, 80) andBackgroundColor:[UIColor clearColor]];
+//    NSString *mBtnTitle = [[NSString alloc]init];
+//    mBtnTitle = @"继续购物";
+//    UIButton *mBtn = [self.view createButtonWithFrame:CGRectMake(10, 30, DWIDTH_CONTROLLER_DEFAULT-20, 40) andBackImageName:nil andTarget:self andAction:@selector(goOnShopping:) andTitle:mBtnTitle andTag:1];
+//    mBtn.backgroundColor = DColor_c4291f;
+//    [mView addSubview:mBtn];
+//    return mView;
+//}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    return [self chitOrderDetailCell:tableView withRow:indexPath.row];
+    return nil;
+}
+
+//代金券订单详情
+- (UITableViewCell *)chitOrderDetailCell:(UITableView *)tableView withRow:(NSInteger)row{
+    //代金券订单详情
+    if (row == 0) {
+        DCoupon1Cell *mCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[DCoupon1Cell class]];
+        mCell.model = _ordersDetailModel;
+        return mCell;
+    }else if (row == 1) {
+        IndentDetailCell2 *mCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[IndentDetailCell2 class]];
+        mCell.orderDetailModel = _ordersDetailModel;
+        return mCell;
+    }else if (row == 5) {
+        IndentDetailCell3 *mCell = [DTools loadTableViewCell:self.dMainTableView cellClass:[IndentDetailCell3 class]];
+        mCell.ordersDetailModel = _ordersDetailModel;
+        return mCell;
+    }else {
+        static NSString *cell4 = @"cell44";
+        UITableViewCell *mCell = [tableView dequeueReusableCellWithIdentifier:cell4];
+        
+        mCell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cell4];
+        lb1 = (UILabel *)[mCell.contentView viewWithTag:901];
+        if (!lb1) {
+            lb1 = [self.view creatLabelWithFrame:CGRectMake(10, 7, 100, 30) AndFont:14.0f AndBackgroundColor:[UIColor clearColor] AndText:nil AndTextAlignment:NSTextAlignmentLeft AndTextColor:DColor_666666 andCornerRadius:0.0f];
+            lb1.tag = 901;
+            [mCell.contentView addSubview:lb1];
+        }
+        lb2 = (UILabel *)[mCell.contentView viewWithTag:902];
+        if (!lb2) {
+            lb2 = [self.view creatLabelWithFrame:CGRectMake(CGRectGetMaxX(lb1.frame)+10, 7, DWIDTH_CONTROLLER_DEFAULT-CGRectGetMaxX(lb1.frame)-20, 30) AndFont:14.0f AndBackgroundColor:[UIColor clearColor] AndText:nil AndTextAlignment:NSTextAlignmentLeft AndTextColor:DColor_666666 andCornerRadius:0.0f];
+            lb2.tag = 902;
+            [mCell.contentView addSubview:lb2];
+        }
+        lb3.hidden = NO;
+        lb2.frame = CGRectMake(CGRectGetMaxX(lb1.frame)+10, 7, DWIDTH_CONTROLLER_DEFAULT-CGRectGetMaxX(lb1.frame)-20, 30);
+        lb2.textAlignment = NSTextAlignmentLeft;
+        lb3 = (UILabel *)[mCell.contentView viewWithTag:903];
+        if (!lb3) {
+            lb3 = [self.view creatLabelWithFrame:CGRectMake(DWIDTH_CONTROLLER_DEFAULT-110, 7, 100, 30) AndFont:15.0f AndBackgroundColor:[UIColor clearColor] AndText:nil AndTextAlignment:NSTextAlignmentRight AndTextColor:DColor_c4291f andCornerRadius:0.0f];
+            lb3.tag = 903;
+            [mCell.contentView addSubview:lb3];
+        }
+        lb3.hidden = NO;
+        
+        if (row == 2) {
+            lb1.text = @"代金券";
+            if (_ordersDetailModel.endTime == nil) {
+                lb2.text = @"无";
+            }else{
+                lb2.text = [NSString stringWithFormat:@"有效期至: %@",_ordersDetailModel.endTime];
+            }
+            lb2.textAlignment = NSTextAlignmentRight;
+            lb3.hidden = YES;
+        }
+        if (row == 3) {
+            lb1.text = @"密码";
+            lb2.frame = CGRectMake(CGRectGetMaxX(lb1.frame)+10, 7, DWIDTH_CONTROLLER_DEFAULT-CGRectGetMaxX(lb1.frame)-120, 30);
+            if (_ordersDetailModel.code == nil) {
+                lb2.text = @"无";
+            }else{
+                lb2.text = _ordersDetailModel.code;
+            }
+            switch ([_ordersDetailModel.status intValue]) {
+                case 0:
+                    lb3.text = @"已取消";
+                    break;
+                case 10:
+                    lb3.text = @"已支付";
+                    break;
+                case 11:
+                    lb3.text = @"待支付";
+                    break;
+                case 20:
+                    lb3.text = @"待发货";
+                    break;
+                case 30:
+                    lb3.text = @"已发货";
+                    break;
+                case 40:
+                    lb3.text = @"交易完成";
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
+        if (row == 4) {
+            lb1.text = @"订单信息";
+            lb2.hidden = YES;
+            lb3.hidden = YES;
+        }
+        return mCell;
+    }
+    return nil;
+    
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 1) {
+        if (alertView.tag == 1) {
+            [self cancleOrder];
+        }else if (alertView.tag == 2) {
+            [self deleteOrder];
+        }
+    }
+}
+//取消订单
+- (void)cancleOrder
+{
+    NSDictionary *parameter = [NSDictionary dictionaryWithObjectsAndKeys:get_userId,@"userId",self.model.order_id,@"orderId", @"buyer",@"type", nil];
+    [DOrderOperation cancelOrder:parameter success:^{
+        self.block();
+        pop();
+    }];
+}
+//删除订单
+- (void)deleteOrder
+{
+    NSDictionary *parameter = [NSDictionary dictionaryWithObjectsAndKeys:get_userId,@"userId",self.model.order_id,@"orderIds", @"buyer",@"type", nil];
+    [DOrderOperation deleteOrder:parameter success:^{
+        self.block();
+        pop();
+    }];
+}
+
+- (void)callback:(CallbackToDMyOrderListViewController)block
+{
+    self.block = block;
+}
+
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+/*
+#pragma mark - Navigation
+
+// In a storyboard-based application, you will often want to do a little preparation before navigation
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    // Get the new view controller using [segue destinationViewController].
+    // Pass the selected object to the new view controller.
+}
+*/
+
+@end
